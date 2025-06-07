@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "demo": {
+    "ChartGenerator": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -61,10 +61,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "demo:build:production"
+              "buildTarget": "ChartGenerator:build:production"
             },
             "development": {
-              "buildTarget": "demo:build:development"
+              "buildTarget": "ChartGenerator:build:development"
             }
           },
           "defaultConfiguration": "development"
