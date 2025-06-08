@@ -1,8 +1,36 @@
-<canvas
-  baseChart
-  [data]="lineChartData"
-  [options]="lineChartOptions"
-  [type]="lineChartType"
-  (chartHover)="chartHovered($event)"
-  (chartClick)="chartClicked($event)"
-></canvas>
+<div class="gap-4 grid grid-cols-2">
+  <div>
+    <mat-card class="example-card" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Setting</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form>
+          <mat-form-field>
+            <mat-label>Favorite food</mat-label>
+            <input matInput placeholder="Ex. Pizza" value="Sushi" />
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Leave a comment</mat-label>
+            <textarea matInput placeholder="Ex. It makes me feel..."></textarea>
+          </mat-form-field>
+        </form>
+      </mat-card-content>
+      <mat-card-actions>
+        <button matButton>LIKE</button>
+        <button matButton>SHARE</button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+  <div>
+    <canvas
+      baseChart
+      [data]="lineChartData"
+      [options]="lineChartOptions"
+      [type]="lineChartType"
+      (chartHover)="chartHovered($event)"
+      (chartClick)="chartClicked($event)"
+    ></canvas>
+  </div>
+</div>

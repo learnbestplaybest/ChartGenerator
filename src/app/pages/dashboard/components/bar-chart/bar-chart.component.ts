@@ -1,4 +1,9 @@
 import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 import { ChartConfiguration, ChartEvent, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
@@ -7,7 +12,14 @@ import { BaseChartDirective } from 'ng2-charts';
   selector: 'app-bar-chart',
   templateUrl: './bar-chart.component.html',
   styleUrls: ['./bar-chart.component.scss'],
-  imports: [BaseChartDirective],
+  imports: [
+    BaseChartDirective,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatCardModule,
+    MatButtonModule,
+  ],
 })
 export class BarChartComponent {
   public lineChartData: ChartConfiguration['data'] = {
