@@ -1,0 +1,36 @@
+<div class="flex flex-wrap gap-2 m-8">
+  <button
+    [matButton]="selectedChartType == 'bar' ? 'filled' : 'tonal'"
+    extended
+    (click)="chartSelection('bar')"
+  >
+    <mat-icon>bar_chart</mat-icon>
+    Bar chart
+  </button>
+  <button
+    [matButton]="selectedChartType == 'line' ? 'filled' : 'tonal'"
+    extended
+    (click)="chartSelection('line')"
+  >
+    <mat-icon>show_chart</mat-icon>
+    Line chart
+  </button>
+  <button
+    [matButton]="selectedChartType == 'pie' ? 'filled' : 'tonal'"
+    extended
+    (click)="chartSelection('pie')"
+  >
+    <mat-icon>pie_chart</mat-icon>
+    Pie chart
+  </button>
+</div>
+
+<section>
+  <ng-container [ngSwitch]="selectedChartType">
+    <div *ngSwitchCase="'bar'">
+      <app-bar-chart></app-bar-chart>
+    </div>
+    <div *ngSwitchCase="'line'"></div>
+    <div *ngSwitchCase="'pie'"></div>
+  </ng-container>
+</section>
