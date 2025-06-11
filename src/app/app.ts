@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
+
 import { RouterOutlet } from '@angular/router';
 
 @Component({
@@ -6,6 +7,7 @@ import { RouterOutlet } from '@angular/router';
   imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.scss',
+  encapsulation: ViewEncapsulation.None,
 })
 export class App {
   protected title = 'chart-generator';

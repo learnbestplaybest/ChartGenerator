@@ -28,9 +28,13 @@
 <section class="p-4">
   <ng-container [ngSwitch]="selectedChartType">
     <div *ngSwitchCase="'bar'">
-      <app-bar-chart></app-bar-chart>
+      <app-bar-chart />
     </div>
-    <div *ngSwitchCase="'line'"></div>
-    <div *ngSwitchCase="'pie'"></div>
+    <div *ngSwitchCase="'line'">
+      <app-line-chart />
+    </div>
+    <div *ngSwitchCase="'pie'">
+      <app-pie-chart />
+    </div>
   </ng-container>
 </section>

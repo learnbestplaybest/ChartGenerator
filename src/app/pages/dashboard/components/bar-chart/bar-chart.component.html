@@ -5,32 +5,62 @@
         <mat-card-title>Setting</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <form>
-          <mat-form-field>
-            <mat-label>Favorite food</mat-label>
-            <input matInput placeholder="Ex. Pizza" value="Sushi" />
-          </mat-form-field>
-
-          <mat-form-field>
-            <mat-label>Leave a comment</mat-label>
-            <textarea matInput placeholder="Ex. It makes me feel..."></textarea>
-          </mat-form-field>
-        </form>
+        <table>
+          <tr>
+            <th class="border-r-1 border-b-1 border-gray-300"></th>
+            <th class="border-b-1 border-gray-300 p-4">
+              <button
+                mat-button
+                mat-raised-button
+                color="primary"
+                (click)="randomize()"
+              >
+                Add series
+              </button>
+            </th>
+          </tr>
+           @if (barChartData.labels?.length) {
+            <ng-container  *ngFor="let label of barChartData.labels">
+              <tr>
+                
+              </tr>
+            </ng-container>
+            }
+          <tr>
+            <td class="border-r-1 border-gray-300 p-4">
+              <button
+                mat-button
+                mat-raised-button
+                color="primary"
+                (click)="randomize()"
+              >
+                Add label
+              </button>
+            </td>
+          </tr>
+        </table>
       </mat-card-content>
       <mat-card-actions>
-        <button matButton>LIKE</button>
-        <button matButton>SHARE</button>
+        <button
+          mat-button
+          mat-raised-button
+          color="primary"
+          (click)="randomize()"
+        >
+          Update
+        </button>
       </mat-card-actions>
     </mat-card>
   </div>
   <div>
     <canvas
       baseChart
-      [data]="lineChartData"
-      [options]="lineChartOptions"
-      [type]="lineChartType"
+      type="bar"
+      [data]="barChartData"
+      [options]="barChartOptions"
       (chartHover)="chartHovered($event)"
       (chartClick)="chartClicked($event)"
-    ></canvas>
+    >
+    </canvas>
   </div>
 </div>

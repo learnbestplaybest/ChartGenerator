@@ -1,0 +1,75 @@
+<div class="gap-4 grid grid-cols-2">
+  <div>
+    <mat-card class="example-card" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Setting</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form>
+          <mat-form-field>
+            <mat-label>Favorite food</mat-label>
+            <input matInput placeholder="Ex. Pizza" value="Sushi" />
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Leave a comment</mat-label>
+            <textarea matInput placeholder="Ex. It makes me feel..."></textarea>
+          </mat-form-field>
+        </form>
+      </mat-card-content>
+      <mat-card-actions>
+        <div class="button-row">
+          <button
+            mat-button
+            mat-raised-button
+            color="primary"
+            (click)="toggleLegend()"
+          >
+            Toggle Legend
+          </button>
+          <button
+            mat-button
+            mat-raised-button
+            color="primary"
+            (click)="changeLabels()"
+          >
+            Change Labels
+          </button>
+          <button
+            mat-button
+            mat-raised-button
+            color="primary"
+            (click)="addSlice()"
+          >
+            Add Slice
+          </button>
+          <button
+            mat-button
+            mat-raised-button
+            color="primary"
+            (click)="removeSlice()"
+          >
+            Remove Slice
+          </button>
+          <button
+            mat-button
+            mat-raised-button
+            color="primary"
+            (click)="changeLegendPosition()"
+          >
+            Change Legend Position
+          </button>
+        </div>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+  <div class="chart-content">
+    <canvas
+      baseChart
+      [data]="pieChartData"
+      [type]="pieChartType"
+      [options]="pieChartOptions"
+    >
+    </canvas>
+  </div>
+</div>
