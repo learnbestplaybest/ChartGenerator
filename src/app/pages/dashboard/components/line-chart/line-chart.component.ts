@@ -1,67 +1,40 @@
-import { ChartConfiguration, ChartEvent, ChartType } from 'chart.js';
-import { Component, ViewChild } from '@angular/core';
-
-import { BaseChartDirective } from 'ng2-charts';
+import { CommonModule } from '@angular/common';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatSliderModule } from '@angular/material/slider';
+
+import { ChartConfiguration } from 'chart.js';
+import html2canvas from 'html2canvas';
+import { BaseChartDirective } from 'ng2-charts';
 
 @Component({
   selector: 'app-line-chart',
   templateUrl: './line-chart.component.html',
   styleUrls: ['./line-chart.component.scss'],
   imports: [
+    CommonModule,
     BaseChartDirective,
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatCardModule,
     MatButtonModule,
+    MatIconModule,
+    MatSliderModule,
   ],
 })
 export class LineChartComponent {
-  private newLabel? = 'New label';
+  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
+  @ViewChild('captureMe', { static: false }) captureMe!: ElementRef;
 
   public lineChartData: ChartConfiguration['data'] = {
-    datasets: [
-      {
-        data: [65, 59, 80, 81, 56, 55, 40],
-        label: 'Series A',
-        backgroundColor: 'rgba(148,159,177,0.2)',
-        borderColor: 'rgba(148,159,177,1)',
-        pointBackgroundColor: 'rgba(148,159,177,1)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(148,159,177,0.8)',
-        fill: 'origin',
-      },
-      {
-        data: [28, 48, 40, 19, 86, 27, 90],
-        label: 'Series B',
-        backgroundColor: 'rgba(77,83,96,0.2)',
-        borderColor: 'rgba(77,83,96,1)',
-        pointBackgroundColor: 'rgba(77,83,96,1)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(77,83,96,1)',
-        fill: 'origin',
-      },
-      {
-        data: [180, 480, 770, 90, 1000, 270, 400],
-        label: 'Series C',
-        yAxisID: 'y1',
-        backgroundColor: 'rgba(255,0,0,0.3)',
-        borderColor: 'red',
-        pointBackgroundColor: 'rgba(148,159,177,1)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(148,159,177,0.8)',
-        fill: 'origin',
-      },
-    ],
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+    datasets: [],
+    labels: [],
   };
 
   public lineChartOptions: ChartConfiguration['options'] = {
@@ -70,115 +43,117 @@ export class LineChartComponent {
         tension: 0.5,
       },
     },
-    scales: {
-      // We use this empty structure as a placeholder for dynamic theming.
-      y: {
-        position: 'left',
-      },
-      y1: {
-        position: 'right',
-        grid: {
-          color: 'rgba(255,0,0,0.3)',
-        },
-        ticks: {
-          color: 'red',
-        },
-      },
-    },
-
     plugins: {
       legend: { display: true },
-      annotation: {
-        annotations: [
-          {
-            type: 'line',
-            scaleID: 'x',
-            value: 'March',
-            borderColor: 'orange',
-            borderWidth: 2,
-            label: {
-              display: true,
-              position: 'center',
-              color: 'orange',
-              content: 'LineAnno',
-              font: {
-                weight: 'bold',
-              },
-            },
-          },
-        ],
-      },
-    } as any,
+    },
   };
 
-  public lineChartType: ChartType = 'line';
-
-  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
-
-  private static generateNumber(i: number): number {
-    return Math.floor(Math.random() * (i < 2 ? 100 : 1000) + 1);
+  get tensionValue() {
+    return (this.lineChartOptions!.elements!.line!.tension as number) * 100;
   }
 
-  public randomize(): void {
-    for (let i = 0; i < this.lineChartData.datasets.length; i++) {
-      for (let j = 0; j < this.lineChartData.datasets[i].data.length; j++) {
-        this.lineChartData.datasets[i].data[j] =
-          LineChartComponent.generateNumber(i);
-      }
-    }
-    this.chart?.update();
+  trackByFn(index: number, item: any) {
+    return index;
   }
 
-  // events
-  public chartClicked({
-    event,
-    active,
-  }: {
-    event?: ChartEvent;
-    active?: object[];
-  }): void {
-    console.log(event, active);
-  }
+  exportAsImage() {
+    html2canvas(this.captureMe.nativeElement).then((canvas) => {
+      const image = canvas.toDataURL('image/png');
 
-  public chartHovered({
-    event,
-    active,
-  }: {
-    event?: ChartEvent;
-    active?: object[];
-  }): void {
-    console.log(event, active);
-  }
-
-  public hideOne(): void {
-    const isHidden = this.chart?.isDatasetHidden(1);
-    this.chart?.hideDataset(1, !isHidden);
-  }
-
-  public pushOne(): void {
-    this.lineChartData.datasets.forEach((x, i) => {
-      const num = LineChartComponent.generateNumber(i);
-      x.data.push(num);
+      const link = document.createElement('a');
+      link.href = image;
+      link.download = `bar_chart_${new Date()
+        .toLocaleString('en-GB', { hour12: false })
+        .replace(/[/,:\s]/g, '')}.png`;
+      link.click();
     });
-    this.lineChartData?.labels?.push(
-      `Label ${this.lineChartData.labels.length}`
-    );
-
-    this.chart?.update();
   }
 
-  public changeColor(): void {
-    this.lineChartData.datasets[2].borderColor = 'green';
-    this.lineChartData.datasets[2].backgroundColor = `rgba(0, 255, 0, 0.3)`;
+  tensionChanged = (event: Event) => {
+    const value = Number((event.target as HTMLInputElement).value);
+    const currentData = { ...this.lineChartOptions };
+    currentData.elements!.line!.tension = value / 100 || 0;
 
-    this.chart?.update();
-  }
+    this.lineChartOptions = currentData;
+  };
 
-  public changeLabel(): void {
-    const tmp = this.newLabel;
-    this.newLabel = this.lineChartData.datasets[2].label;
-    this.lineChartData.datasets[2].label = tmp;
+  addLabel = () => {
+    const currentData = { ...this.lineChartData };
+    currentData.labels?.push('');
 
-    this.chart?.update();
-  }
+    currentData.datasets.forEach((dataSet) => {
+      dataSet.data.push(0);
+    });
+
+    this.lineChartData = currentData;
+  };
+
+  addSeries = () => {
+    const currentData = { ...this.lineChartData };
+    currentData.datasets.push({
+      data: new Array(currentData.labels?.length),
+      label: '',
+      borderColor: 'black',
+    });
+
+    this.lineChartData = currentData;
+  };
+
+  updateLabel = (labelIndex: number, event: Event) => {
+    const value = (event.target as HTMLTextAreaElement).value;
+    const currentData = { ...this.lineChartData };
+
+    currentData.labels![labelIndex] = value;
+
+    this.lineChartData = currentData;
+  };
+
+  updateSeriesLabel = (seriesIndex: number, event: Event) => {
+    const value = (event.target as HTMLTextAreaElement).value;
+    const currentData = { ...this.lineChartData };
+
+    currentData.datasets[seriesIndex].label = value;
+
+    this.lineChartData = currentData;
+  };
+
+  updateSeriesValue = (
+    labelIndex: number,
+    seriesIndex: number,
+    event: Event
+  ) => {
+    const value = (event.target as HTMLInputElement).value as any;
+    const currentData = { ...this.lineChartData };
+
+    currentData.datasets[seriesIndex].data[labelIndex] = value;
+
+    this.lineChartData = currentData;
+  };
+
+  updateSeriesColor = (seriesIndex: number, event: Event) => {
+    const value = (event.target as HTMLInputElement).value;
+    const currentData = { ...this.lineChartData };
+
+    currentData.datasets[seriesIndex].borderColor = value;
+
+    this.lineChartData = currentData;
+  };
+
+  deleteLabel = (index: number) => {
+    const currentData = { ...this.lineChartData };
+
+    currentData.labels?.splice(index, 1);
+    currentData.datasets.forEach((dataSet) => {
+      dataSet.data.splice(index, 1);
+    });
+
+    this.lineChartData = currentData;
+  };
+
+  deleteSeries = (index: number) => {
+    const currentData = { ...this.lineChartData };
+    currentData.datasets.splice(index, 1);
+
+    this.lineChartData = currentData;
+  };
 }

@@ -1,3 +1,23 @@
 .chart-content {
   height: calc(100vh - 200px);
 }
+
+.mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+.mat-mdc-form-field-infix {
+  min-height: auto !important;
+  width: 80px !important;
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+}
+
+.mat-mdc-form-field-textarea-control {
+  min-height: 25px !important;
+}
+
+.mat-mdc-card-content {
+  overflow: auto;
+  padding: 16px !important;
+}

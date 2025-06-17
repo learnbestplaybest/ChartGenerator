@@ -1,78 +1,142 @@
-import { ChartConfiguration, ChartData, ChartEvent, ChartType } from 'chart.js';
-import { Component, ViewChild } from '@angular/core';
-
-import { BaseChartDirective } from 'ng2-charts';
+import { CommonModule } from '@angular/common';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+
+import { ChartConfiguration, ChartData } from 'chart.js';
+import html2canvas from 'html2canvas';
+import { BaseChartDirective } from 'ng2-charts';
 
 @Component({
   selector: 'app-bar-chart',
   templateUrl: './bar-chart.component.html',
   styleUrls: ['./bar-chart.component.scss'],
   imports: [
+    CommonModule,
     BaseChartDirective,
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatCardModule,
     MatButtonModule,
+    MatIconModule,
   ],
 })
 export class BarChartComponent {
   @ViewChild(BaseChartDirective) chart: BaseChartDirective<'bar'> | undefined;
+  @ViewChild('captureMe', { static: false }) captureMe!: ElementRef;
 
   public barChartOptions: ChartConfiguration<'bar'>['options'] = {
     plugins: {
       legend: {
         display: true,
       },
-    }
+    },
   };
 
   public barChartData: ChartData<'bar'> = {
-    labels: ['2006', '2007', '2008', '2009', '2010', '2011', '2012'],
-    datasets: [
-      { data: [65, 59, 80, 81, 56, 55, 40], label: 'Series A' },
-      { data: [28, 48, 40, 19, 86, 27, 90], label: 'Series B' },
-    ],
+    labels: [],
+    datasets: [],
   };
 
-  // events
-  public chartClicked({
-    event,
-    active,
-  }: {
-    event?: ChartEvent;
-    active?: object[];
-  }): void {
-    console.log(event, active);
+  trackByFn(index: number, item: any) {
+    return index;
   }
 
-  public chartHovered({
-    event,
-    active,
-  }: {
-    event?: ChartEvent;
-    active?: object[];
-  }): void {
-    console.log(event, active);
+  exportAsImage() {
+    html2canvas(this.captureMe.nativeElement).then((canvas) => {
+      const image = canvas.toDataURL('image/png');
+
+      const link = document.createElement('a');
+      link.href = image;
+      link.download = `bar_chart_${new Date()
+        .toLocaleString('en-GB', { hour12: false })
+        .replace(/[/,:\s]/g, '')}.png`;
+      link.click();
+    });
   }
 
-  public randomize(): void {
-    // Only Change 3 values
-    this.barChartData.datasets[0].data = [
-      Math.round(Math.random() * 100),
-      59,
-      80,
-      Math.round(Math.random() * 100),
-      56,
-      Math.round(Math.random() * 100),
-      40,
-    ];
+  addLabel = () => {
+    const currentData = { ...this.barChartData };
+    currentData.labels?.push('');
 
-    this.chart?.update();
-  }
+    currentData.datasets.forEach((dataSet) => {
+      dataSet.data.push(0);
+    });
+
+    this.barChartData = currentData;
+  };
+
+  addSeries = () => {
+    const currentData = { ...this.barChartData };
+    currentData.datasets.push({
+      data: new Array(currentData.labels?.length),
+      label: '',
+      backgroundColor: 'black',
+    });
+
+    this.barChartData = currentData;
+  };
+
+  updateLabel = (labelIndex: number, event: Event) => {
+    const value = (event.target as HTMLTextAreaElement).value;
+    const currentData = { ...this.barChartData };
+
+    currentData.labels![labelIndex] = value;
+
+    this.barChartData = currentData;
+  };
+
+  updateSeriesLabel = (seriesIndex: number, event: Event) => {
+    const value = (event.target as HTMLTextAreaElement).value;
+    const currentData = { ...this.barChartData };
+
+    currentData.datasets[seriesIndex].label = value;
+
+    this.barChartData = currentData;
+  };
+
+  updateSeriesValue = (
+    labelIndex: number,
+    seriesIndex: number,
+    event: Event
+  ) => {
+    const value = (event.target as HTMLInputElement).value as any;
+    const currentData = { ...this.barChartData };
+
+    currentData.datasets[seriesIndex].data[labelIndex] = value;
+
+    this.barChartData = currentData;
+  };
+
+  updateSeriesColor = (seriesIndex: number, event: Event) => {
+    const value = (event.target as HTMLInputElement).value;
+    const currentData = { ...this.barChartData };
+
+    currentData.datasets[seriesIndex].backgroundColor = value;
+
+    this.barChartData = currentData;
+  };
+
+  deleteLabel = (index: number) => {
+    const currentData = { ...this.barChartData };
+
+    currentData.labels?.splice(index, 1);
+    currentData.datasets.forEach((dataSet) => {
+      dataSet.data.splice(index, 1);
+    });
+
+    this.barChartData = currentData;
+  };
+
+  deleteSeries = (index: number) => {
+    const currentData = { ...this.barChartData };
+    currentData.datasets.splice(index, 1);
+
+    this.barChartData = currentData;
+  };
 }

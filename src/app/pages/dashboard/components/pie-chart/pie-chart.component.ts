@@ -1,30 +1,40 @@
-import { ChartConfiguration, ChartData, ChartEvent, ChartType } from 'chart.js';
-import { Component, ViewChild } from '@angular/core';
-
-import { BaseChartDirective } from 'ng2-charts';
+import { CommonModule } from '@angular/common';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import {
+  MatCheckboxChange,
+  MatCheckboxModule,
+} from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+
+import { ChartConfiguration } from 'chart.js';
+import html2canvas from 'html2canvas';
+import { BaseChartDirective } from 'ng2-charts';
 
 @Component({
   selector: 'app-pie-chart',
   templateUrl: './pie-chart.component.html',
   styleUrls: ['./pie-chart.component.scss'],
   imports: [
+    CommonModule,
     BaseChartDirective,
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatCardModule,
     MatButtonModule,
+    MatIconModule,
+    MatCheckboxModule,
   ],
 })
 export class PieChartComponent {
   @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
+  @ViewChild('captureMe', { static: false }) captureMe!: ElementRef;
 
-  // Pie
   public pieChartOptions: ChartConfiguration['options'] = {
     plugins: {
       legend: {
@@ -32,142 +42,115 @@ export class PieChartComponent {
         position: 'top',
       },
       datalabels: {
-        formatter: (value: any, ctx: any) => {
-          if (ctx.chart.data.labels) {
-            return ctx.chart.data.labels[ctx.dataIndex];
-          }
-          return '';
+        formatter: function (value: any, context: any) {
+          return context.chart.data.labels[context.dataIndex];
         },
       },
-    } as any,
-  };
-  public pieChartData: ChartData<'pie', number[], string | string[]> = {
-    labels: [['Download', 'Sales'], ['In', 'Store', 'Sales'], 'Mail Sales'],
+    },
+  } as any;
+
+  public pieChartData: any = {
+    labels: [],
     datasets: [
       {
-        data: [300, 500, 100],
+        data: [],
+        backgroundColor: [],
       },
     ],
   };
-  public pieChartType: ChartType = 'pie';
 
-  // events
-  public chartClicked({
-    event,
-    active,
-  }: {
-    event: ChartEvent;
-    active: object[];
-  }): void {
-    console.log(event, active);
+  trackByFn(index: number, item: any) {
+    return index;
   }
 
-  public chartHovered({
-    event,
-    active,
-  }: {
-    event: ChartEvent;
-    active: object[];
-  }): void {
-    console.log(event, active);
+  exportAsImage() {
+    html2canvas(this.captureMe.nativeElement).then((canvas) => {
+      const image = canvas.toDataURL('image/png');
+
+      const link = document.createElement('a');
+      link.href = image;
+      link.download = `bar_chart_${new Date()
+        .toLocaleString('en-GB', { hour12: false })
+        .replace(/[/,:\s]/g, '')}.png`;
+      link.click();
+    });
   }
 
-  changeLabels(): void {
-    const words = [
-      'hen',
-      'variable',
-      'embryo',
-      'instal',
-      'pleasant',
-      'physical',
-      'bomber',
-      'army',
-      'add',
-      'film',
-      'conductor',
-      'comfortable',
-      'flourish',
-      'establish',
-      'circumstance',
-      'chimney',
-      'crack',
-      'hall',
-      'energy',
-      'treat',
-      'window',
-      'shareholder',
-      'division',
-      'disk',
-      'temptation',
-      'chord',
-      'left',
-      'hospital',
-      'beef',
-      'patrol',
-      'satisfied',
-      'academy',
-      'acceptance',
-      'ivory',
-      'aquarium',
-      'building',
-      'store',
-      'replace',
-      'language',
-      'redeem',
-      'honest',
-      'intention',
-      'silk',
-      'opera',
-      'sleep',
-      'innocent',
-      'ignore',
-      'suite',
-      'applaud',
-      'funny',
-    ];
-    const randomWord = () => words[Math.trunc(Math.random() * words.length)];
-    this.pieChartData.labels = new Array(3).map(() => randomWord());
+  donutViewChange = (event: MatCheckboxChange) => {
+    const currentData = { ...this.pieChartOptions } as any;
+    currentData.cutout = event.checked ? '50%' : '';
 
-    this.chart?.update();
-  }
+    this.pieChartOptions = currentData;
+  };
 
-  addSlice(): void {
-    if (this.pieChartData.labels) {
-      this.pieChartData.labels.push(['Line 1', 'Line 2', 'Line 3']);
-    }
+  addLabel = () => {
+    const currentData = { ...this.pieChartData };
+    currentData.labels?.push('');
 
-    this.pieChartData.datasets[0].data.push(400);
+    currentData.datasets.forEach((dataSet: any) => {
+      dataSet.data.push(0);
+    });
 
-    this.chart?.update();
-  }
+    this.pieChartData = currentData;
+  };
 
-  removeSlice(): void {
-    if (this.pieChartData.labels) {
-      this.pieChartData.labels.pop();
-    }
+  addSeries = () => {
+    const currentData = { ...this.pieChartData };
+    currentData.datasets.push({
+      data: new Array(currentData.labels?.length),
+      label: '',
+      borderColor: 'black',
+    });
 
-    this.pieChartData.datasets[0].data.pop();
+    this.pieChartData = currentData;
+  };
 
-    this.chart?.update();
-  }
+  updateLabel = (labelIndex: number, event: Event) => {
+    const value = (event.target as HTMLTextAreaElement).value;
+    const currentData = { ...this.pieChartData };
 
-  changeLegendPosition(): void {
-    if (this.pieChartOptions?.plugins?.legend) {
-      this.pieChartOptions.plugins.legend.position =
-        this.pieChartOptions.plugins.legend.position === 'left'
-          ? 'top'
-          : 'left';
-    }
+    currentData.labels![labelIndex] = value;
 
-    this.chart?.render();
-  }
+    this.pieChartData = currentData;
+  };
 
-  toggleLegend(): void {
-    if (this.pieChartOptions?.plugins?.legend) {
-      this.pieChartOptions.plugins.legend.display =
-        !this.pieChartOptions.plugins.legend.display;
-    }
+  updateSeriesValue = (
+    labelIndex: number,
+    seriesIndex: number,
+    event: Event
+  ) => {
+    const value = (event.target as HTMLInputElement).value as any;
+    const currentData = { ...this.pieChartData };
 
-    this.chart?.render();
-  }
+    currentData.datasets[seriesIndex].data[labelIndex] = value;
+
+    this.pieChartData = currentData;
+  };
+
+  updateSeriesColor = (labelIndex: number, event: Event) => {
+    const value = (event.target as HTMLInputElement).value;
+    const currentData = { ...this.pieChartData };
+
+    (currentData.datasets[0].backgroundColor as any)[labelIndex] = value;
+
+    this.pieChartData = currentData;
+  };
+
+  deleteLabel = (index: number) => {
+    const currentData = { ...this.pieChartData };
+
+    currentData.labels?.splice(index, 1);
+    currentData.datasets.forEach((dataSet: any) => {
+      dataSet.data.splice(index, 1);
+    });
+
+    this.pieChartData = currentData;
+  };
+
+  deleteSeries = (index: number) => {
+    const currentData = { ...this.pieChartData };
+    currentData.datasets.splice(index, 1);
+
+    this.pieChartData = currentData;
+  };
 }

@@ -1,76 +1,142 @@
 <div class="gap-4 grid grid-cols-2">
   <div>
-    <mat-card class="example-card" appearance="outlined">
+    <mat-card class="chart-setting-container" appearance="outlined">
       <mat-card-header>
         <mat-card-title>Setting</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <form>
-          <mat-form-field>
-            <mat-label>Favorite food</mat-label>
-            <input matInput placeholder="Ex. Pizza" value="Sushi" />
-          </mat-form-field>
-
-          <mat-form-field>
-            <mat-label>Leave a comment</mat-label>
-            <textarea matInput placeholder="Ex. It makes me feel..."></textarea>
-          </mat-form-field>
-        </form>
+        <label class="pr-2">Tension</label>
+        <mat-slider>
+          <input
+            matSliderThumb
+            [value]="tensionValue"
+            (input)="tensionChanged($event)"
+          />
+        </mat-slider>
+        <table>
+          <tr>
+            <th class="border-gray-300 border-r-1 border-b-1"></th>
+            <ng-container
+              *ngFor="
+                let dataSet of lineChartData.datasets;
+                index as seriesIndex
+              "
+            >
+              <th
+                class="p-2 border-gray-300 border-b-1"
+                *ngIf="lineChartData.datasets?.length"
+              >
+                <mat-form-field appearance="outline">
+                  <textarea
+                    matInput
+                    [value]="dataSet.label"
+                    (input)="updateSeriesLabel(seriesIndex, $event)"
+                  ></textarea>
+                  <input
+                    type="color"
+                    class="w-full"
+                    [value]="dataSet.backgroundColor"
+                    (input)="updateSeriesColor(seriesIndex, $event)"
+                  />
+                  <button
+                    matIconButton
+                    class="delete-btn"
+                    (click)="deleteSeries(seriesIndex)"
+                  >
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </mat-form-field>
+              </th>
+            </ng-container>
+            <th class="p-2 border-gray-300 border-b-1">
+              <button matButton="filled" (click)="addSeries()">
+                <mat-icon>add</mat-icon>
+                series
+              </button>
+            </th>
+          </tr>
+          @if (lineChartData.labels?.length) {
+          <ng-container
+            *ngFor="
+              let label of lineChartData.labels;
+              index as labelIndex;
+              trackBy: trackByFn
+            "
+          >
+            <tr>
+              <td
+                class="p-2 pr-4 border-gray-300 border-r-1"
+                [class.pt-4]="labelIndex == 0"
+              >
+                <mat-form-field appearance="outline">
+                  <textarea
+                    matInput
+                    [value]="label"
+                    (input)="updateLabel(labelIndex, $event)"
+                  ></textarea>
+                  <button
+                    matIconButton
+                    class="delete-btn"
+                    (click)="deleteLabel(labelIndex)"
+                  >
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </mat-form-field>
+              </td>
+              <ng-container
+                *ngFor="
+                  let dataSet of lineChartData.datasets;
+                  index as seriesIndex
+                "
+              >
+                <td
+                  class="p-2 text-center"
+                  *ngIf="lineChartData.datasets?.length"
+                >
+                  <mat-form-field
+                    appearance="outline"
+                    style="width: 80px !important"
+                  >
+                    <input
+                      type="number"
+                      matInput
+                      [value]="dataSet.data[labelIndex]"
+                      (input)="
+                        updateSeriesValue(labelIndex, seriesIndex, $event)
+                      "
+                    />
+                  </mat-form-field>
+                </td>
+              </ng-container>
+            </tr>
+          </ng-container>
+          }
+          <tr>
+            <td class="p-2 border-gray-300 border-r-1 text-center">
+              <button matButton="filled" (click)="addLabel()">
+                <mat-icon>add</mat-icon>
+                label
+              </button>
+            </td>
+          </tr>
+        </table>
       </mat-card-content>
       <mat-card-actions>
-        <div class="button-row">
-          <button
-            mat-button
-            mat-raised-button
-            color="primary"
-            (click)="randomize()"
-          >
-            Randomize
-          </button>
-          <button
-            mat-button
-            mat-raised-button
-            color="primary"
-            (click)="pushOne()"
-          >
-            Push
-          </button>
-          <button
-            mat-button
-            mat-raised-button
-            color="primary"
-            (click)="changeColor()"
-          >
-            Recolor
-          </button>
-          <button
-            mat-button
-            mat-raised-button
-            color="primary"
-            (click)="hideOne()"
-          >
-            Toggle Series B
-          </button>
-          <button
-            mat-button
-            mat-raised-button
-            color="primary"
-            (click)="changeLabel()"
-          >
-            Change Label
-          </button>
-        </div>
+        <button matButton="tonal" (click)="exportAsImage()">
+          <mat-icon>download</mat-icon>
+          Save image
+        </button>
       </mat-card-actions>
     </mat-card>
   </div>
   <div>
     <canvas
+      #captureMe
+      id="captureDiv"
       baseChart
+      type="line"
       [data]="lineChartData"
       [options]="lineChartOptions"
-      [type]="lineChartType"
-      (chartHover)="chartHovered($event)"
-      (chartClick)="chartClicked($event)"
     ></canvas>
   </div>
 </div>
