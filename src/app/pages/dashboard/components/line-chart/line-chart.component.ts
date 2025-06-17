@@ -62,7 +62,7 @@ export class LineChartComponent {
 
       const link = document.createElement('a');
       link.href = image;
-      link.download = `bar_chart_${new Date()
+      link.download = `line_chart_${new Date()
         .toLocaleString('en-GB', { hour12: false })
         .replace(/[/,:\s]/g, '')}.png`;
       link.click();
