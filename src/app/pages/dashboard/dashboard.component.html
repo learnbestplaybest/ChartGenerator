@@ -1,4 +1,103 @@
-<div class="top-0 z-10 sticky flex flex-wrap gap-2 bg-white p-4">
+<div class="bg-gray-900 p-4 sm:p-6 lg:p-8 min-h-screen text-gray-200">
+  <div class="mx-auto max-w-7xl">
+    <!-- Header Section -->
+    <!-- Phần tiêu đề -->
+    <header class="flex sm:flex-row flex-col justify-between items-center mb-8">
+      <h1 class="mb-4 sm:mb-0 font-bold text-white text-3xl">
+        Chart Generator
+      </h1>
+      <button
+        class="flex justify-center items-center bg-blue-600 hover:bg-blue-700 shadow-md px-4 py-2 rounded-lg w-full sm:w-auto font-semibold text-white hover:scale-105 transition-transform transform"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="mr-2 w-5 h-5"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        Tạo biểu đồ mới
+      </button>
+    </header>
+
+    <!-- Filter Section -->
+    <!-- Phần bộ lọc -->
+    <div class="mb-8">
+      <h2 class="mb-3 font-semibold text-gray-300 text-xl">Bộ lọc</h2>
+      <div class="flex flex-wrap gap-2">
+        <button (click)="applyFilter('all')" [class]="getFilterClass('all')">
+          Tất cả
+        </button>
+        <button (click)="applyFilter('line')" [class]="getFilterClass('line')">
+          Biểu đồ đường (Line)
+        </button>
+        <button (click)="applyFilter('bar')" [class]="getFilterClass('bar')">
+          Biểu đồ cột (Bar)
+        </button>
+        <button (click)="applyFilter('pie')" [class]="getFilterClass('pie')">
+          Biểu đồ tròn (Pie)
+        </button>
+      </div>
+    </div>
+
+    <!-- Charts Grid Section -->
+    <!-- Lưới hiển thị các biểu đồ -->
+    <main>
+      <h2 class="mb-4 font-semibold text-gray-300 text-xl">
+        Danh sách biểu đồ
+      </h2>
+      <div
+        *ngIf="filteredCharts.length > 0; else noCharts"
+        class="gap-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+      >
+        <div
+          *ngFor="let chart of filteredCharts"
+          class="flex flex-col justify-between bg-gray-800 shadow-lg hover:shadow-blue-500/20 p-5 rounded-xl transition-all hover:-translate-y-1 duration-300"
+        >
+          <div>
+            <div class="flex justify-between items-center mb-3">
+              <span [class]="getBadgeClass(chart.type)">{{ chart.type }}</span>
+              <div [innerHTML]="getIcon(chart.type)"></div>
+            </div>
+            <h3 class="font-bold text-white text-lg truncate">
+              {{ chart.name }}
+            </h3>
+          </div>
+        </div>
+      </div>
+      <ng-template #noCharts>
+        <div class="bg-gray-800 px-6 py-16 rounded-lg text-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="mx-auto w-12 h-12 text-gray-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <h3 class="mt-2 font-medium text-white text-lg">
+            Không tìm thấy biểu đồ
+          </h3>
+          <p class="mt-1 text-gray-400 text-sm">
+            Không có biểu đồ nào khớp với bộ lọc của bạn.
+          </p>
+        </div>
+      </ng-template>
+    </main>
+  </div>
+</div>
+<!-- <div class="top-0 z-10 sticky flex flex-wrap gap-2 bg-white p-4">
   <button
     [matButton]="selectedChartType == 'bar' ? 'filled' : 'tonal'"
     extended
@@ -37,4 +136,4 @@
       <app-pie-chart />
     </div>
   </ng-container>
-</section>
+</section> -->
