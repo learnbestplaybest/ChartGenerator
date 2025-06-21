@@ -1,12 +1,12 @@
-import { Component, OnInit, inject } from '@angular/core';
-
 import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-import { RoutePath } from '../../app.routes';
 import { Router } from '@angular/router';
+
+import { RoutePath } from '../../app.routes';
 
 interface Chart {
   id: number;

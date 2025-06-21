@@ -1,0 +1,16 @@
+{
+  "chartGenerator": "Chart Generator",
+  "createNewChart": "Create new chart",
+  "filters": "Filters",
+  "all": "All",
+  "lineChart": "Line Chart",
+  "barChart": "Bar Chart",
+  "pieChart": "Pie Chart",
+  "chartList": "Chart List",
+  "noChartsFound": "No charts found",
+  "noChartsMatch": "No charts match your filter.",
+  "line": "Line",
+  "bar": "Bar",
+  "pie": "Pie",
+  "selectChartType": "Select a chart type to start"
+}
