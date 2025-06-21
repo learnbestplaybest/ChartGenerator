@@ -1,3 +1,57 @@
+<chart-detail
+  [type]="chartType"
+  [chartInfo]="chartDetails"
+  [chartData]="data"
+  [chartOption]="options"
+>
+  <!-- This div with the 'chartSetting' attribute will be projected -->
+  <!-- into the <ng-content> slot of the child component. -->
+  <div chartSetting>
+    <form class="p-5 space-y-6">
+      <div>
+        <label
+          for="chart-title"
+          class="block text-sm font-medium text-gray-300 mb-1"
+          >Tiêu đề Biểu đồ</label
+        >
+        <input
+          type="text"
+          id="chart-title"
+          [value]="chartDetails.title"
+          class="w-full bg-gray-700 border-gray-600 text-white rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+      <div>
+        <label
+          for="color-scheme"
+          class="block text-sm font-medium text-gray-300 mb-1"
+          >Bảng màu</label
+        >
+        <select
+          id="color-scheme"
+          class="w-full bg-gray-700 border-gray-600 text-white rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option>Xanh dương</option>
+          <option>Xanh lá</option>
+        </select>
+      </div>
+      <div>
+        <label
+          for="data-source"
+          class="block text-sm font-medium text-gray-300 mb-1"
+          >Nguồn Dữ liệu (JSON)</label
+        >
+        <textarea
+          id="data-source"
+          rows="6"
+          class="w-full bg-gray-700 border-gray-600 text-white rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+          >{{ data | json }}</textarea
+        >
+      </div>
+    </form>
+  </div>
+</chart-detail>
+
 <div class="gap-4 grid grid-cols-2">
   <div>
     <mat-card class="chart-setting-container" appearance="outlined">

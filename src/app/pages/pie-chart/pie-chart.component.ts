@@ -1,19 +1,19 @@
-import { CommonModule } from '@angular/common';
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
 import {
   MatCheckboxChange,
   MatCheckboxModule,
 } from '@angular/material/checkbox';
+
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartConfiguration } from 'chart.js';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-
-import { ChartConfiguration } from 'chart.js';
 import html2canvas from 'html2canvas';
-import { BaseChartDirective } from 'ng2-charts';
 
 @Component({
   selector: 'app-pie-chart',
@@ -64,7 +64,7 @@ export class PieChartComponent {
   }
 
   exportAsImage() {
-    html2canvas(this.captureMe.nativeElement).then((canvas) => {
+    html2canvas(this.captureMe.nativeElement).then((canvas: any) => {
       const image = canvas.toDataURL('image/png');
 
       const link = document.createElement('a');

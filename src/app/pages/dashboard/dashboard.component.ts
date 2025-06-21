@@ -1,9 +1,12 @@
+import { Component, OnInit, inject } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
+import { RoutePath } from '../../app.routes';
+import { Router } from '@angular/router';
 
 interface Chart {
   id: number;
@@ -23,6 +26,8 @@ interface Chart {
   ],
 })
 export class DashboardComponent implements OnInit {
+  private _router = inject(Router);
+
   allCharts: Chart[] = [
     { id: 1, name: 'Doanh thu hàng tháng', type: 'bar' },
     { id: 2, name: 'Lượng người dùng mới', type: 'line' },
@@ -101,9 +106,17 @@ export class DashboardComponent implements OnInit {
   }
 
   selectChartType(type: 'line' | 'bar' | 'pie'): void {
-    console.log(
-      `Đang chuyển hướng để tạo biểu đồ loại: ${type}. URL sẽ là /charts/create/${type}`
-    );
+    switch (type) {
+      case 'bar':
+        this._router.navigate([RoutePath.BarChart]);
+        break;
+      case 'line':
+        this._router.navigate([RoutePath.LineChart]);
+        break;
+      case 'pie':
+        this._router.navigate([RoutePath.PieChart]);
+        break;
+    }
     this.closePopover();
   }
 

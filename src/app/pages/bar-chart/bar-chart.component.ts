@@ -1,15 +1,20 @@
-import { CommonModule } from '@angular/common';
+import { ChartConfiguration, ChartData } from 'chart.js';
+import {
+  ChartDetailComponent,
+  ChartInfo,
+  ChartType,
+} from '../../shared/components/chart-detail.component';
 import { Component, ElementRef, ViewChild } from '@angular/core';
+
+import { BaseChartDirective } from 'ng2-charts';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-
-import { ChartConfiguration, ChartData } from 'chart.js';
 import html2canvas from 'html2canvas';
-import { BaseChartDirective } from 'ng2-charts';
 
 @Component({
   selector: 'app-bar-chart',
@@ -24,9 +29,36 @@ import { BaseChartDirective } from 'ng2-charts';
     MatCardModule,
     MatButtonModule,
     MatIconModule,
+    ChartDetailComponent,
   ],
 })
 export class BarChartComponent {
+  chartType: ChartType = 'bar';
+
+  chartDetails: ChartInfo = {
+    title: 'Doanh thu hàng tháng',
+    creationDate: '21 tháng 6, 2025',
+  };
+
+  data = {
+    labels: ['Tháng 1', 'Tháng 2', 'Tháng 3'],
+    datasets: [
+      {
+        label: 'Doanh thu',
+        data: [450, 730, 620],
+      },
+    ],
+  };
+
+  options = {
+    responsive: true,
+  };
+
+  // This is a helper to stringify the data for the textarea
+  get json() {
+    return JSON.stringify(this.data, null, 2);
+  }
+
   @ViewChild(BaseChartDirective) chart: BaseChartDirective<'bar'> | undefined;
   @ViewChild('captureMe', { static: false }) captureMe!: ElementRef;
 
