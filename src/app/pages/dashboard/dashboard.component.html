@@ -123,9 +123,9 @@
       >
         <div
           *ngFor="let chart of filteredCharts"
-          class="flex flex-col justify-between bg-gray-800 shadow-lg hover:shadow-blue-500/20 p-5 rounded-xl transition-all hover:-translate-y-1 duration-300 cursor-pointer"
+          class="relative flex flex-col justify-between bg-gray-800 shadow-lg hover:shadow-blue-500/20 rounded-xl transition-all hover:-translate-y-1 duration-300"
         >
-          <div>
+          <a (click)="navigateToDetail(chart)" class="block p-5 cursor-pointer">
             <div class="flex justify-between items-center mb-3">
               <span [class]="getBadgeClass(chart.type)">{{
                 chart.type | translate | async
@@ -137,9 +137,20 @@
               </div>
             </div>
             <h3 class="font-bold text-white text-lg truncate">
-              {{ chart.name }}
+              {{ chart.options.plugins.title.text }}
             </h3>
-          </div>
+            <p class="mt-2 text-gray-400 text-xs truncate">
+              <i class="mr-1 fa-regular fa-calendar-alt"></i>
+              {{ "creationDate" | translate | async }}
+              {{ chart.details.creationDate }}
+            </p>
+          </a>
+          <button
+            (click)="deleteChart(chart, $event)"
+            class="right-3 bottom-3 z-10 absolute flex justify-center items-center bg-gray-700/50 hover:bg-red-500/50 rounded-full w-8 h-8 text-gray-400 hover:text-white transition-colors cursor-pointer"
+          >
+            <i class="fa-solid fa-trash-can fa-sm"></i>
+          </button>
         </div>
       </div>
       <ng-template #noCharts>

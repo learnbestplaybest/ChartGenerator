@@ -1,0 +1,73 @@
+<div class="p-4 sm:p-6 lg:p-8">
+  <header
+    class="flex md:flex-row flex-col justify-between items-start md:items-center gap-4 mb-8"
+  >
+    <div class="flex items-center gap-4">
+      <a
+        href="#"
+        onclick="history.back(); return false;"
+        class="bg-gray-800 hover:bg-gray-700 px-[11px] py-2 rounded-full text-gray-400 hover:text-white transition-colors"
+        attr.aria-label="{{ 'goBack' | translate | async }}"
+      >
+        <i class="fa-arrow-left fa-solid fa-lg"></i>
+      </a>
+      <div>
+        <input
+          type="text"
+          [value]="chartOption!.plugins!.title!.text"
+          (input)="updateChartTitle($event)"
+          class="bg-gray-700 px-2 py-1 border border-gray-500 rounded-lg rounded-lg focus:ring-0 w-full font-bold text-white text-2xl"
+          placeholder="{{ 'chartTitle' | translate | async }}"
+        />
+        <div class="flex items-center gap-4 mt-1 text-gray-400 text-sm">
+          <span class="flex items-center gap-2">
+            <div [ngSwitch]="type" class="text-gray-500 fa-lg">
+              <i *ngSwitchCase="'line'" class="fa-solid fa-chart-line"></i>
+              <i *ngSwitchCase="'bar'" class="fa-solid fa-chart-simple"></i>
+              <i *ngSwitchCase="'pie'" class="fa-solid fa-chart-pie"></i>
+            </div>
+            {{ type | translate | async }}
+          </span>
+          <span class="flex items-center gap-2">
+            <i class="fa-solid fa-calendar-days"></i>
+            {{ "creationDate" | translate | async }}:
+            {{ chartInfo.creationDate }}
+          </span>
+        </div>
+      </div>
+    </div>
+    <button
+      (click)="saveImage()"
+      class="flex justify-center items-center gap-2 bg-blue-600 hover:bg-blue-700 shadow-md px-4 py-2 rounded-lg w-full md:w-auto font-semibold text-white hover:scale-105 transition-transform cursor-pointer transform"
+    >
+      <i class="fa-solid fa-floppy-disk"></i>
+      {{ "saveImage" | translate | async }}
+    </button>
+  </header>
+
+  <main class="gap-8 grid grid-cols-1 lg:grid-cols-3">
+    <aside
+      class="lg:col-span-1 bg-gray-800 shadow-lg rounded-xl h-fit overflow-auto"
+      style="max-height: calc(100vh - 200px)"
+    >
+      <div class="p-5 border-gray-700 border-b">
+        <h2 class="flex items-center gap-2 font-semibold text-white text-xl">
+          <i class="fa-solid fa-sliders"></i>
+          {{ "settings" | translate | async }}
+        </h2>
+      </div>
+      <ng-content select="[chartSetting]"></ng-content>
+    </aside>
+
+    <section class="lg:col-span-2 bg-white shadow-lg p-2 sm:p-4 rounded-xl">
+      <canvas
+        #captureMe
+        baseChart
+        [type]="type"
+        [data]="chartData"
+        [options]="chartOption"
+      >
+      </canvas>
+    </section>
+  </main>
+</div>

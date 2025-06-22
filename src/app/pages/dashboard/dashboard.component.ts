@@ -1,13 +1,15 @@
-import { Component, OnInit, inject } from '@angular/core';
-
 import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-import { RoutePath } from '../../app.routes';
 import { Router } from '@angular/router';
+
+import { RoutePath } from '../../app.routes';
+import { ChartDataModel } from '../../shared/models/chart.model';
 import { TranslatePipe } from '../../shared/pipes/translate-pipe';
+import { StorageService } from '../../shared/services/storage.service';
 
 interface Chart {
   id: number;
@@ -29,28 +31,77 @@ interface Chart {
 })
 export class DashboardComponent implements OnInit {
   private _router = inject(Router);
+  private _storageService = inject(StorageService);
 
-  allCharts: Chart[] = [
-    { id: 1, name: 'Doanh thu hàng tháng', type: 'bar' },
-    { id: 2, name: 'Lượng người dùng mới', type: 'line' },
-    { id: 3, name: 'Tỷ lệ hệ điều hành', type: 'pie' },
-    { id: 4, name: 'Chi phí quảng cáo', type: 'line' },
-    { id: 5, name: 'Sản phẩm bán chạy', type: 'bar' },
-    { id: 6, name: 'Mức độ hài lòng của khách hàng', type: 'pie' },
-    { id: 7, name: 'Lượt truy cập website', type: 'line' },
-    { id: 8, name: 'So sánh doanh số Q1 và Q2', type: 'bar' },
-    { id: 9, name: 'Nguồn truy cập', type: 'pie' },
-    { id: 10, name: 'Tỷ lệ chuyển đổi', type: 'line' },
-    { id: 11, name: 'Số lượng vé đã bán', type: 'bar' },
-    { id: 12, name: 'Phân bổ ngân sách', type: 'pie' },
-  ];
-
-  filteredCharts: Chart[] = [];
+  allCharts: ChartDataModel[] = [];
+  filteredCharts: ChartDataModel[] = [];
   currentFilter: string = 'all';
   isPopoverOpen: boolean = false;
 
   ngOnInit() {
+    this.loadChartsFromStorage();
+
     this.applyFilter('all');
+  }
+
+  loadChartsFromStorage(): void {
+    let charts = this._storageService.getCharts();
+    this.allCharts = charts;
+    this.applyFilter('all');
+  }
+
+  createNewChart(type: 'line' | 'bar' | 'pie'): string {
+    const chartId = `chart-${Date.now()}`;
+    const newChart: ChartDataModel = {
+      id: chartId,
+      type: type,
+      details: {
+        creationDate: new Date().toLocaleString(),
+      },
+      data: {
+        labels: [],
+        datasets: [],
+      },
+      options: {
+        plugins: {
+          legend: { display: true },
+          title: {
+            display: true,
+            text: '',
+          },
+        },
+      },
+    };
+    this._storageService.saveChart(newChart);
+
+    return chartId;
+  }
+
+  deleteChart(chart: ChartDataModel, event: MouseEvent): void {
+    event.stopPropagation();
+    if (
+      window.confirm(
+        `Bạn có chắc chắn muốn xóa biểu đồ "${chart.options.plugins.title.text}" không?`
+      )
+    ) {
+      this._storageService.deleteChart(chart.id);
+      this.loadChartsFromStorage(); // Tải lại danh sách để cập nhật UI
+    }
+  }
+
+  navigateToDetail(chart: ChartDataModel): void {
+    const chartId = chart.id;
+    switch (chart.type) {
+      case 'bar':
+        this._router.navigate([RoutePath.BarChart, chartId]);
+        break;
+      case 'line':
+        this._router.navigate([RoutePath.LineChart, chartId]);
+        break;
+      case 'pie':
+        this._router.navigate([RoutePath.PieChart, chartId]);
+        break;
+    }
   }
 
   applyFilter(type: string) {
@@ -73,15 +124,16 @@ export class DashboardComponent implements OnInit {
   }
 
   selectChartType(type: 'line' | 'bar' | 'pie'): void {
+    const chartId = this.createNewChart(type);
     switch (type) {
       case 'bar':
-        this._router.navigate([RoutePath.BarChart]);
+        this._router.navigate([RoutePath.BarChart, chartId]);
         break;
       case 'line':
-        this._router.navigate([RoutePath.LineChart]);
+        this._router.navigate([RoutePath.LineChart, chartId]);
         break;
       case 'pie':
-        this._router.navigate([RoutePath.PieChart]);
+        this._router.navigate([RoutePath.PieChart, chartId]);
         break;
     }
     this.closePopover();

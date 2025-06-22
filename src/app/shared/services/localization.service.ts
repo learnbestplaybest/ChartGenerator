@@ -1,8 +1,9 @@
-import { BehaviorSubject, Observable, map, tap } from 'rxjs';
-import { Injectable, inject } from '@angular/core';
-
 import { HttpClient } from '@angular/common/http';
-import { StorageService } from './storagte.service';
+import { inject, Injectable } from '@angular/core';
+
+import { BehaviorSubject, map, Observable, tap } from 'rxjs';
+
+import { StorageService } from './storage.service';
 
 @Injectable({
   providedIn: 'root',

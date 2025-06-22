@@ -9,9 +9,6 @@
   "chartList": "Danh sách biểu đồ",
   "noChartsFound": "Không tìm thấy biểu đồ",
   "noChartsMatch": "Không có biểu đồ nào khớp với bộ lọc của bạn.",
-  "line": "Đường",
-  "bar": "Cột",
-  "pie": "Tròn",
   "selectChartType": "Chọn một loại biểu đồ để bắt đầu",
   "goBack": "Quay lại",
   "line": "Biểu đồ đường",
@@ -19,5 +16,6 @@
   "pie": "Biểu đồ tròn",
   "creationDate": "Tạo ngày",
   "saveImage": "Lưu ảnh",
-  "settings": "Cài đặt"
+  "settings": "Cài đặt",
+  "chartTitle": "Tiêu đề biểu đồ"
 }

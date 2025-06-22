@@ -9,9 +9,6 @@
   "chartList": "Chart List",
   "noChartsFound": "No charts found",
   "noChartsMatch": "No charts match your filter.",
-  "line": "Line",
-  "bar": "Bar",
-  "pie": "Pie",
   "selectChartType": "Select a chart type to start",
   "goBack": "Go Back",
   "line": "Line Chart",
@@ -19,5 +16,6 @@
   "pie": "Pie Chart",
   "creationDate": "Created on",
   "saveImage": "Save Image",
-  "settings": "Settings"
+  "settings": "Settings",
+  "chartTitle": "Chart title"
 }
