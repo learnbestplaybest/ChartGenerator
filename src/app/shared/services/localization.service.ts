@@ -1,43 +1,35 @@
+import { BehaviorSubject, Observable, map, tap } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-
-import { BehaviorSubject, map, Observable, tap } from 'rxjs';
-
-type State = {
-  currentLang: 'en' | 'vi';
-};
-
-const initialState = {
-  currentLang: 'en',
-} as State;
+import { StorageService } from './storagte.service';
 
 @Injectable({
-  providedIn: 'root', // Singleton trên toàn ứng dụng
+  providedIn: 'root',
 })
 export class LocalizationService {
-  // Dùng BehaviorSubject để lưu trữ và phát ra ngôn ngữ hiện tại
-  private language$ = new BehaviorSubject<string>('en');
-  // Dùng BehaviorSubject để lưu trữ tất cả các bản dịch đã tải
+  private _storageService = inject(StorageService);
   private translations$ = new BehaviorSubject<any>({});
+  language$ = new BehaviorSubject<string>('en');
 
   constructor(private http: HttpClient) {
-    this.loadTranslations('en'); // Tải ngôn ngữ mặc định khi khởi tạo
+    const initialLang = this._storageService.getLanguage();
+    this.language$ = new BehaviorSubject<string>(initialLang);
+    this.loadTranslations('en');
   }
 
-  // Phương thức để thay đổi ngôn ngữ
   public setLanguage(lang: string): void {
+    this._storageService.saveLanguage(lang);
     this.language$.next(lang);
     this.loadTranslations(lang);
   }
 
-  // Tải file dịch
   private loadTranslations(lang: string): void {
-    // Nếu đã tải rồi thì không tải lại
     if (this.translations$.value[lang]) {
       return;
     }
     this.http
-      .get(`/locales/localize.${lang}.json`)
+      .get(`assets/locales/locale.${lang}.json`)
       .pipe(
         tap((translations) => {
           const currentTranslations = this.translations$.value;
@@ -50,11 +42,10 @@ export class LocalizationService {
       .subscribe();
   }
 
-  // Lấy một chuỗi dịch cụ thể, trả về một Observable
   public get(key: string): Observable<string> {
     return this.language$.pipe(
       map((lang) => this.translations$.value[lang]),
-      map((translations) => translations?.[key] || key) // Fallback về chính key nếu không tìm thấy
+      map((translations) => translations?.[key] || key)
     );
   }
 }

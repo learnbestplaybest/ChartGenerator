@@ -12,5 +12,12 @@
   "line": "Line",
   "bar": "Bar",
   "pie": "Pie",
-  "selectChartType": "Select a chart type to start"
+  "selectChartType": "Select a chart type to start",
+  "goBack": "Go Back",
+  "line": "Line Chart",
+  "bar": "Bar Chart",
+  "pie": "Pie Chart",
+  "creationDate": "Created on",
+  "saveImage": "Save Image",
+  "settings": "Settings"
 }

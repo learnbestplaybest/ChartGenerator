@@ -1,189 +1,107 @@
 <chart-detail
   [type]="chartType"
   [chartInfo]="chartDetails"
-  [chartData]="data"
-  [chartOption]="options"
+  [chartData]="barChartData"
+  [chartOption]="barChartOptions"
 >
-  <!-- This div with the 'chartSetting' attribute will be projected -->
-  <!-- into the <ng-content> slot of the child component. -->
   <div chartSetting>
-    <form class="p-5 space-y-6">
-      <div>
-        <label
-          for="chart-title"
-          class="block text-sm font-medium text-gray-300 mb-1"
-          >Tiêu đề Biểu đồ</label
+    <table>
+      <tr>
+        <th class="border-gray-300 border-r-1 border-b-1"></th>
+        <ng-container
+          *ngFor="let dataSet of barChartData.datasets; index as seriesIndex"
         >
-        <input
-          type="text"
-          id="chart-title"
-          [value]="chartDetails.title"
-          class="w-full bg-gray-700 border-gray-600 text-white rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
-        />
-      </div>
-      <div>
-        <label
-          for="color-scheme"
-          class="block text-sm font-medium text-gray-300 mb-1"
-          >Bảng màu</label
-        >
-        <select
-          id="color-scheme"
-          class="w-full bg-gray-700 border-gray-600 text-white rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
-        >
-          <option>Xanh dương</option>
-          <option>Xanh lá</option>
-        </select>
-      </div>
-      <div>
-        <label
-          for="data-source"
-          class="block text-sm font-medium text-gray-300 mb-1"
-          >Nguồn Dữ liệu (JSON)</label
-        >
-        <textarea
-          id="data-source"
-          rows="6"
-          class="w-full bg-gray-700 border-gray-600 text-white rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
-          >{{ data | json }}</textarea
-        >
-      </div>
-    </form>
+          <th
+            class="p-2 border-gray-300 border-b-1"
+            *ngIf="barChartData.datasets?.length"
+          >
+            <mat-form-field appearance="outline">
+              <textarea
+                class="text-white"
+                matInput
+                [value]="dataSet.label"
+                (input)="updateSeriesLabel(seriesIndex, $event)"
+              ></textarea>
+              <input
+                type="color"
+                class="w-full"
+                [value]="dataSet.backgroundColor"
+                (input)="updateSeriesColor(seriesIndex, $event)"
+              />
+              <button
+                matIconButton
+                class="delete-btn"
+                (click)="deleteSeries(seriesIndex)"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            </mat-form-field>
+          </th>
+        </ng-container>
+        <th class="p-2 border-gray-300 border-b-1">
+          <button matButton="filled" (click)="addSeries()">
+            <mat-icon>add</mat-icon>
+            series
+          </button>
+        </th>
+      </tr>
+      @if (barChartData.labels?.length) {
+      <ng-container
+        *ngFor="
+          let label of barChartData.labels;
+          index as labelIndex;
+          trackBy: trackByFn
+        "
+      >
+        <tr>
+          <td
+            class="p-2 pr-4 border-gray-300 border-r-1"
+            [class.pt-4]="labelIndex == 0"
+          >
+            <mat-form-field appearance="outline">
+              <textarea
+                class="text-white"
+                matInput
+                [value]="label"
+                (input)="updateLabel(labelIndex, $event)"
+              ></textarea>
+              <button
+                matIconButton
+                class="delete-btn"
+                (click)="deleteLabel(labelIndex)"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            </mat-form-field>
+          </td>
+          <ng-container
+            *ngFor="let dataSet of barChartData.datasets; index as seriesIndex"
+          >
+            <td class="p-2 text-center" *ngIf="barChartData.datasets?.length">
+              <mat-form-field
+                appearance="outline"
+                style="width: 80px !important"
+              >
+                <input
+                  type="number"
+                  matInput
+                  [value]="dataSet.data[labelIndex]"
+                  (input)="updateSeriesValue(labelIndex, seriesIndex, $event)"
+                />
+              </mat-form-field>
+            </td>
+          </ng-container>
+        </tr>
+      </ng-container>
+      }
+      <tr>
+        <td class="p-2 border-gray-300 border-r-1 text-center">
+          <button matButton="filled" (click)="addLabel()">
+            <mat-icon>add</mat-icon>
+            label
+          </button>
+        </td>
+      </tr>
+    </table>
   </div>
 </chart-detail>
-
-<div class="gap-4 grid grid-cols-2">
-  <div>
-    <mat-card class="chart-setting-container" appearance="outlined">
-      <mat-card-header>
-        <mat-card-title>Setting</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <table>
-          <tr>
-            <th class="border-gray-300 border-r-1 border-b-1"></th>
-            <ng-container
-              *ngFor="
-                let dataSet of barChartData.datasets;
-                index as seriesIndex
-              "
-            >
-              <th
-                class="p-2 border-gray-300 border-b-1"
-                *ngIf="barChartData.datasets?.length"
-              >
-                <mat-form-field appearance="outline">
-                  <textarea
-                    matInput
-                    [value]="dataSet.label"
-                    (input)="updateSeriesLabel(seriesIndex, $event)"
-                  ></textarea>
-                  <input
-                    type="color"
-                    class="w-full"
-                    [value]="dataSet.backgroundColor"
-                    (input)="updateSeriesColor(seriesIndex, $event)"
-                  />
-                  <button
-                    matIconButton
-                    class="delete-btn"
-                    (click)="deleteSeries(seriesIndex)"
-                  >
-                    <mat-icon>close</mat-icon>
-                  </button>
-                </mat-form-field>
-              </th>
-            </ng-container>
-            <th class="p-2 border-gray-300 border-b-1">
-              <button matButton="filled" (click)="addSeries()">
-                <mat-icon>add</mat-icon>
-                series
-              </button>
-            </th>
-          </tr>
-          @if (barChartData.labels?.length) {
-          <ng-container
-            *ngFor="
-              let label of barChartData.labels;
-              index as labelIndex;
-              trackBy: trackByFn
-            "
-          >
-            <tr>
-              <td
-                class="p-2 pr-4 border-gray-300 border-r-1"
-                [class.pt-4]="labelIndex == 0"
-              >
-                <mat-form-field appearance="outline">
-                  <textarea
-                    matInput
-                    [value]="label"
-                    (input)="updateLabel(labelIndex, $event)"
-                  ></textarea>
-                  <button
-                    matIconButton
-                    class="delete-btn"
-                    (click)="deleteLabel(labelIndex)"
-                  >
-                    <mat-icon>close</mat-icon>
-                  </button>
-                </mat-form-field>
-              </td>
-              <ng-container
-                *ngFor="
-                  let dataSet of barChartData.datasets;
-                  index as seriesIndex
-                "
-              >
-                <td
-                  class="p-2 text-center"
-                  *ngIf="barChartData.datasets?.length"
-                >
-                  <mat-form-field
-                    appearance="outline"
-                    style="width: 80px !important"
-                  >
-                    <input
-                      type="number"
-                      matInput
-                      [value]="dataSet.data[labelIndex]"
-                      (input)="
-                        updateSeriesValue(labelIndex, seriesIndex, $event)
-                      "
-                    />
-                  </mat-form-field>
-                </td>
-              </ng-container>
-            </tr>
-          </ng-container>
-          }
-          <tr>
-            <td class="p-2 border-gray-300 border-r-1 text-center">
-              <button matButton="filled" (click)="addLabel()">
-                <mat-icon>add</mat-icon>
-                label
-              </button>
-            </td>
-          </tr>
-        </table>
-      </mat-card-content>
-      <mat-card-actions>
-        <button matButton="tonal" (click)="exportAsImage()">
-          <mat-icon>download</mat-icon>
-          Save image
-        </button>
-      </mat-card-actions>
-    </mat-card>
-  </div>
-  <div>
-    <canvas
-      #captureMe
-      id="captureDiv"
-      baseChart
-      type="bar"
-      [data]="barChartData"
-      [options]="barChartOptions"
-    >
-    </canvas>
-  </div>
-</div>

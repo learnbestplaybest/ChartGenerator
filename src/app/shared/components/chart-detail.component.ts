@@ -1,6 +1,15 @@
-import { Component, Input, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  ViewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 
+import { BaseChartDirective } from 'ng2-charts';
 import { CommonModule } from '@angular/common';
+import { TranslatePipe } from '../pipes/translate-pipe';
+import html2canvas from 'html2canvas-pro';
 
 export interface ChartInfo {
   title: string;
@@ -13,47 +22,27 @@ export type ChartType = 'line' | 'bar' | 'pie';
   selector: 'chart-detail',
   templateUrl: 'chart-detail.component.html',
   styleUrls: ['chart-detail.component.scss'],
-  imports: [CommonModule],
+  encapsulation: ViewEncapsulation.None,
+  imports: [CommonModule, TranslatePipe, BaseChartDirective],
 })
 export class ChartDetailComponent {
+  @ViewChild('captureMe', { static: false }) captureMe!: ElementRef;
+
   @Input() type: ChartType = 'bar';
   @Input() chartInfo: ChartInfo | null = null;
   @Input() chartData: any;
   @Input() chartOption: any;
 
-  currentLang: 'vn' | 'en' = 'vn';
-
-  translations = {
-    vn: {
-      goBack: 'Quay lại',
-      line: 'Biểu đồ đường',
-      bar: 'Biểu đồ cột',
-      pie: 'Biểu đồ tròn',
-      creationDate: 'Tạo ngày',
-      saveImage: 'Lưu ảnh',
-      settings: 'Cài đặt',
-    },
-    en: {
-      goBack: 'Go Back',
-      line: 'Line Chart',
-      bar: 'Bar Chart',
-      pie: 'Pie Chart',
-      creationDate: 'Created on',
-      saveImage: 'Save Image',
-      settings: 'Settings',
-    },
-  };
-
-  t(key: string): string {
-    return (this.translations as any)[this.currentLang]?.[key] || key;
-  }
-
   saveImage() {
-    alert('Chức năng Lưu ảnh đang được phát triển!');
-  }
+    html2canvas(this.captureMe.nativeElement).then((canvas) => {
+      const image = canvas.toDataURL('image/png');
 
-  // You can add a method to switch language if needed
-  setLanguage(lang: 'vn' | 'en') {
-    this.currentLang = lang;
+      const link = document.createElement('a');
+      link.href = image;
+      link.download = `bar_chart_${new Date()
+        .toLocaleString('en-GB', { hour12: false })
+        .replace(/[/,:\s]/g, '')}.png`;
+      link.click();
+    });
   }
 }

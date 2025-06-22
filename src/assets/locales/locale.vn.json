@@ -12,5 +12,12 @@
   "line": "Đường",
   "bar": "Cột",
   "pie": "Tròn",
-  "selectChartType": "Chọn một loại biểu đồ để bắt đầu"
+  "selectChartType": "Chọn một loại biểu đồ để bắt đầu",
+  "goBack": "Quay lại",
+  "line": "Biểu đồ đường",
+  "bar": "Biểu đồ cột",
+  "pie": "Biểu đồ tròn",
+  "creationDate": "Tạo ngày",
+  "saveImage": "Lưu ảnh",
+  "settings": "Cài đặt"
 }

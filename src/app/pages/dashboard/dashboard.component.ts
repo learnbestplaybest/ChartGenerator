@@ -1,12 +1,13 @@
+import { Component, OnInit, inject } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-import { Router } from '@angular/router';
-
 import { RoutePath } from '../../app.routes';
+import { Router } from '@angular/router';
+import { TranslatePipe } from '../../shared/pipes/translate-pipe';
 
 interface Chart {
   id: number;
@@ -23,6 +24,7 @@ interface Chart {
     MatDividerModule,
     MatIconModule,
     MatButtonToggleModule,
+    TranslatePipe,
   ],
 })
 export class DashboardComponent implements OnInit {
@@ -46,41 +48,6 @@ export class DashboardComponent implements OnInit {
   filteredCharts: Chart[] = [];
   currentFilter: string = 'all';
   isPopoverOpen: boolean = false;
-  currentLang: 'vn' | 'en' = 'en';
-  translations = {
-    vn: {
-      chartGenerator: 'Trình tạo biểu đồ',
-      createNewChart: 'Tạo biểu đồ mới',
-      filters: 'Bộ lọc',
-      all: 'Tất cả',
-      lineChart: 'Biểu đồ đường',
-      barChart: 'Biểu đồ cột',
-      pieChart: 'Biểu đồ tròn',
-      chartList: 'Danh sách biểu đồ',
-      noChartsFound: 'Không tìm thấy biểu đồ',
-      noChartsMatch: 'Không có biểu đồ nào khớp với bộ lọc của bạn.',
-      line: 'Đường',
-      bar: 'Cột',
-      pie: 'Tròn',
-      selectChartType: 'Chọn một loại biểu đồ để bắt đầu',
-    },
-    en: {
-      chartGenerator: 'Chart Generator',
-      createNewChart: 'Create new chart',
-      filters: 'Filters',
-      all: 'All',
-      lineChart: 'Line Chart',
-      barChart: 'Bar Chart',
-      pieChart: 'Pie Chart',
-      chartList: 'Chart List',
-      noChartsFound: 'No charts found',
-      noChartsMatch: 'No charts match your filter.',
-      line: 'Line',
-      bar: 'Bar',
-      pie: 'Pie',
-      selectChartType: 'Select a chart type to start',
-    },
-  };
 
   ngOnInit() {
     this.applyFilter('all');
@@ -118,14 +85,6 @@ export class DashboardComponent implements OnInit {
         break;
     }
     this.closePopover();
-  }
-
-  setLanguage(lang: 'vn' | 'en') {
-    this.currentLang = lang;
-  }
-
-  t(key: string): string {
-    return (this.translations as any)[this.currentLang][key] || key;
   }
 
   getFilterClass(type: string): string {

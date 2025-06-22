@@ -13,7 +13,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import html2canvas from 'html2canvas';
+import html2canvas from 'html2canvas-pro';
 
 @Component({
   selector: 'app-pie-chart',

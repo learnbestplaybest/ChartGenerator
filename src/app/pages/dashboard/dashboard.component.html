@@ -6,41 +6,15 @@
 ></div>
 
 <div class="relative bg-gray-900 p-4 sm:p-6 lg:p-8 min-h-screen text-gray-200">
-  <div
-    class="top-4 sm:top-6 lg:top-8 right-4 sm:right-6 lg:right-8 z-50 absolute flex items-center gap-4 bg-gray-800 px-3 py-1.5 rounded-full"
-  >
-    <button
-      (click)="setLanguage('vn')"
-      [class]="
-        currentLang === 'vn'
-          ? 'font-bold text-white  cursor-pointer'
-          : 'text-gray-400 hover:text-white transition-colors cursor-pointer'
-      "
-      class="text-sm"
-    >
-      VN
-    </button>
-    <div class="bg-gray-600 w-px h-4"></div>
-    <button
-      (click)="setLanguage('en')"
-      [class]="
-        currentLang === 'en'
-          ? 'font-bold text-white  cursor-pointer'
-          : 'text-gray-400 hover:text-white transition-colors  cursor-pointer'
-      "
-      class="text-sm"
-    >
-      EN
-    </button>
-  </div>
-
   <div class="mx-auto max-w-7xl">
     <header
       class="flex sm:flex-row flex-col justify-between items-center mb-8 header"
     >
       <div class="flex items-center gap-3 mb-4 sm:mb-0">
         <img src="assets/logo.png" alt="Chart generator logo" class="logo" />
-        <h1 class="font-bold text-white text-3xl">{{ t("chartGenerator") }}</h1>
+        <h1 class="font-bold text-white text-3xl">
+          {{ "chartGenerator" | translate | async }}
+        </h1>
       </div>
 
       <div class="relative">
@@ -49,7 +23,7 @@
           class="bg-blue-600 hover:bg-blue-700 shadow-md px-4 py-2 rounded-lg w-full sm:w-auto font-semibold text-white hover:scale-105 transition-transform cursor-pointer transform"
         >
           <i class="mr-2 fa-solid fa-plus"></i>
-          {{ t("createNewChart") }}
+          {{ "createNewChart" | translate | async }}
         </button>
 
         <div
@@ -58,7 +32,7 @@
         >
           <div class="p-4">
             <p class="mb-3 font-semibold text-white text-sm">
-              {{ t("selectChartType") }}
+              {{ "selectChartType" | translate | async }}
             </p>
             <div class="gap-2 grid grid-cols-1">
               <div
@@ -69,7 +43,7 @@
                   class="w-8 text-gray-400 group-hover:text-white transition-colors fa-solid fa-chart-line fa-xl"
                 ></i>
                 <p class="font-semibold text-gray-400 group-hover:text-white">
-                  {{ t("lineChart") }}
+                  {{ "lineChart" | translate | async }}
                 </p>
               </div>
               <div
@@ -80,7 +54,7 @@
                   class="w-8 text-gray-400 group-hover:text-white transition-colors fa-solid fa-chart-simple fa-xl"
                 ></i>
                 <p class="font-semibold text-gray-400 group-hover:text-white">
-                  {{ t("barChart") }}
+                  {{ "barChart" | translate | async }}
                 </p>
               </div>
               <div
@@ -91,7 +65,7 @@
                   class="w-8 text-gray-400 group-hover:text-white transition-colors fa-solid fa-chart-pie fa-xl"
                 ></i>
                 <p class="font-semibold text-gray-400 group-hover:text-white">
-                  {{ t("pieChart") }}
+                  {{ "pieChart" | translate | async }}
                 </p>
               </div>
             </div>
@@ -102,7 +76,7 @@
 
     <div class="mb-8">
       <h2 class="mb-3 font-semibold text-gray-300 text-xl">
-        {{ t("filters") }}
+        {{ "filters" | translate | async }}
       </h2>
       <div class="flex flex-wrap gap-2">
         <button
@@ -110,35 +84,38 @@
           [class]="getFilterClass('all')"
           class="flex items-center gap-2 cursor-pointer"
         >
-          <i class="fa-solid fa-grip"></i> {{ t("all") }}
+          <i class="fa-solid fa-grip"></i> {{ "all" | translate | async }}
         </button>
         <button
           (click)="applyFilter('line')"
           [class]="getFilterClass('line')"
           class="flex items-center gap-2 cursor-pointer"
         >
-          <i class="fa-solid fa-chart-line"></i> {{ t("lineChart") }}
+          <i class="fa-solid fa-chart-line"></i>
+          {{ "lineChart" | translate | async }}
         </button>
         <button
           (click)="applyFilter('bar')"
           [class]="getFilterClass('bar')"
           class="flex items-center gap-2 cursor-pointer"
         >
-          <i class="fa-solid fa-chart-simple"></i> {{ t("barChart") }}
+          <i class="fa-solid fa-chart-simple"></i>
+          {{ "barChart" | translate | async }}
         </button>
         <button
           (click)="applyFilter('pie')"
           [class]="getFilterClass('pie')"
           class="flex items-center gap-2 cursor-pointer"
         >
-          <i class="fa-solid fa-chart-pie"></i> {{ t("pieChart") }}
+          <i class="fa-solid fa-chart-pie"></i>
+          {{ "pieChart" | translate | async }}
         </button>
       </div>
     </div>
 
     <main>
       <h2 class="mb-4 font-semibold text-gray-300 text-xl">
-        {{ t("chartList") }}
+        {{ "chartList" | translate | async }}
       </h2>
       <div
         *ngIf="filteredCharts.length > 0; else noCharts"
@@ -151,7 +128,7 @@
           <div>
             <div class="flex justify-between items-center mb-3">
               <span [class]="getBadgeClass(chart.type)">{{
-                t(chart.type)
+                chart.type | translate | async
               }}</span>
               <div [ngSwitch]="chart.type" class="text-gray-500 fa-lg">
                 <i *ngSwitchCase="'line'" class="fa-solid fa-chart-line"></i>
@@ -169,9 +146,11 @@
         <div class="bg-gray-800 px-6 py-16 rounded-lg text-center">
           <i class="mx-auto text-gray-500 fa-regular fa-folder-open fa-3x"></i>
           <h3 class="mt-4 font-medium text-white text-lg">
-            {{ t("noChartsFound") }}
+            {{ "noChartsFound" | translate | async }}
           </h3>
-          <p class="mt-1 text-gray-400 text-sm">{{ t("noChartsMatch") }}</p>
+          <p class="mt-1 text-gray-400 text-sm">
+            {{ "noChartsMatch" | translate | async }}
+          </p>
         </div>
       </ng-template>
     </main>
