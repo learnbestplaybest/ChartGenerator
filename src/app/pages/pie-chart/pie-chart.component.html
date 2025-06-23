@@ -1,107 +1,77 @@
-<div class="gap-4 grid grid-cols-2">
-  <div>
-    <mat-card class="chart-setting-container" appearance="outlined">
-      <mat-card-header>
-        <mat-card-title>Setting</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <mat-checkbox (change)="donutViewChange($event)"
-          >Donut chart</mat-checkbox
-        >
+<chart-detail
+  type="pie"
+  [chartInfo]="chartDetails"
+  [chartData]="chartData"
+  [chartOption]="chartOptions"
+  [chartId]="chartId"
+>
+  <div chartSetting>
+    <mat-checkbox (change)="donutViewChange($event)">Donut chart</mat-checkbox>
 
-        <table>
-          @if (pieChartData.labels?.length) {
-          <ng-container
-            *ngFor="
-              let label of pieChartData.labels;
-              index as labelIndex;
-              trackBy: trackByFn
-            "
+    <table>
+      @if (chartData.labels?.length) {
+      <ng-container
+        *ngFor="
+          let label of chartData.labels;
+          index as labelIndex;
+          trackBy: trackByFn
+        "
+      >
+        <tr>
+          <td
+            class="p-2 pr-4 border-gray-300 border-r-1"
+            [class.pt-4]="labelIndex == 0"
           >
-            <tr>
-              <td
-                class="p-2 pr-4 border-gray-300 border-r-1"
-                [class.pt-4]="labelIndex == 0"
+            <mat-form-field appearance="outline">
+              <textarea
+                [rows]="1"
+                matInput
+                [value]="label"
+                (input)="updateLabel(labelIndex, $event)"
+              ></textarea>
+              <input
+                type="color"
+                class="w-full"
+                [value]="getBackgroundColor(labelIndex)"
+                (input)="updateSeriesColor(labelIndex, $event)"
+              />
+              <button
+                matIconButton
+                class="delete-btn"
+                (click)="deleteLabel(labelIndex)"
               >
-                <mat-form-field appearance="outline">
-                  <textarea
-                    [rows]="1"
-                    matInput
-                    [value]="label"
-                    (input)="updateLabel(labelIndex, $event)"
-                  ></textarea>
-                  <input
-                    type="color"
-                    class="w-full"
-                    [value]="
-                      pieChartData.datasets[0].backgroundColor[labelIndex]
-                    "
-                    (input)="updateSeriesColor(labelIndex, $event)"
-                  />
-                  <button
-                    matIconButton
-                    class="delete-btn"
-                    (click)="deleteLabel(labelIndex)"
-                  >
-                    <mat-icon>close</mat-icon>
-                  </button>
-                </mat-form-field>
-              </td>
-              <ng-container
-                *ngFor="
-                  let dataSet of pieChartData.datasets;
-                  index as seriesIndex
-                "
-              >
-                <td
-                  class="p-2 text-center"
-                  *ngIf="pieChartData.datasets?.length"
-                >
-                  <mat-form-field
-                    appearance="outline"
-                    style="width: 80px !important"
-                  >
-                    <input
-                      type="number"
-                      matInput
-                      [value]="dataSet.data[labelIndex]"
-                      (input)="
-                        updateSeriesValue(labelIndex, seriesIndex, $event)
-                      "
-                    />
-                  </mat-form-field>
-                </td>
-              </ng-container>
-            </tr>
-          </ng-container>
-          }
-          <tr>
-            <td class="p-2 border-gray-300 border-r-1 text-center">
-              <button matButton="filled" (click)="addLabel()">
-                <mat-icon>add</mat-icon>
-                label
+                <mat-icon>close</mat-icon>
               </button>
+            </mat-form-field>
+          </td>
+          <ng-container
+            *ngFor="let dataSet of chartData.datasets; index as seriesIndex"
+          >
+            <td class="p-2 text-center" *ngIf="chartData.datasets?.length">
+              <mat-form-field
+                appearance="outline"
+                style="width: 80px !important"
+              >
+                <input
+                  type="number"
+                  matInput
+                  [value]="dataSet.data[labelIndex]"
+                  (input)="updateSeriesValue(labelIndex, seriesIndex, $event)"
+                />
+              </mat-form-field>
             </td>
-          </tr>
-        </table>
-      </mat-card-content>
-      <mat-card-actions>
-        <button matButton="tonal" (click)="exportAsImage()">
-          <mat-icon>download</mat-icon>
-          Save image
-        </button>
-      </mat-card-actions>
-    </mat-card>
+          </ng-container>
+        </tr>
+      </ng-container>
+      }
+      <tr>
+        <td class="p-2 border-gray-300 border-r-1 text-center">
+          <button matButton="filled" (click)="addLabel()">
+            <mat-icon>add</mat-icon>
+            label
+          </button>
+        </td>
+      </tr>
+    </table>
   </div>
-  <div class="chart-content">
-    <canvas
-      #captureMe
-      id="captureDiv"
-      baseChart
-      type="pie"
-      [data]="pieChartData"
-      [options]="pieChartOptions"
-    >
-    </canvas>
-  </div>
-</div>
+</chart-detail>

@@ -61,6 +61,7 @@ export class DashboardComponent implements OnInit {
       data: {
         labels: [],
         datasets: [],
+        backgroundColor: [],
       },
       options: {
         plugins: {
@@ -68,6 +69,11 @@ export class DashboardComponent implements OnInit {
           title: {
             display: true,
             text: '',
+          },
+          elements: {
+            line: {
+              tension: 0.5,
+            },
           },
         },
       },

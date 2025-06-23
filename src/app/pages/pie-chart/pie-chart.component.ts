@@ -1,27 +1,28 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import {
   MatCheckboxChange,
   MatCheckboxModule,
 } from '@angular/material/checkbox';
-
-import { BaseChartDirective } from 'ng2-charts';
-import { ChartConfiguration } from 'chart.js';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import html2canvas from 'html2canvas-pro';
+import { ActivatedRoute } from '@angular/router';
+
+import { ChartConfiguration, ChartData } from 'chart.js';
+
+import { ChartDetailComponent } from '../../shared/components/chart-detail/chart-detail.component';
+import { ChartDataModel, ChartInfo } from '../../shared/models/chart.model';
+import { StorageService } from '../../shared/services/storage.service';
 
 @Component({
   selector: 'app-pie-chart',
   templateUrl: './pie-chart.component.html',
-  styleUrls: ['./pie-chart.component.scss'],
   imports: [
     CommonModule,
-    BaseChartDirective,
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
@@ -29,27 +30,17 @@ import html2canvas from 'html2canvas-pro';
     MatButtonModule,
     MatIconModule,
     MatCheckboxModule,
+    ChartDetailComponent,
   ],
 })
-export class PieChartComponent {
-  @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
-  @ViewChild('captureMe', { static: false }) captureMe!: ElementRef;
+export class PieChartComponent implements OnInit {
+  private _activatedRoute = inject(ActivatedRoute);
+  private _storageService = inject(StorageService);
 
-  public pieChartOptions: ChartConfiguration['options'] = {
-    plugins: {
-      legend: {
-        display: true,
-        position: 'top',
-      },
-      datalabels: {
-        formatter: function (value: any, context: any) {
-          return context.chart.data.labels[context.dataIndex];
-        },
-      },
-    },
-  } as any;
-
-  public pieChartData: any = {
+  chartId: string = '';
+  chartDetails: ChartInfo = { creationDate: '' };
+  chartOptions: ChartConfiguration<'pie'>['options'] = {};
+  chartData: ChartData = {
     labels: [],
     datasets: [
       {
@@ -59,59 +50,109 @@ export class PieChartComponent {
     ],
   };
 
+  ngOnInit(): void {
+    this._activatedRoute.params.subscribe((params) => {
+      const id = params['id'];
+      if (!id) return;
+
+      this.chartId = id;
+      const loadedChart = this._storageService.getChartById(id);
+
+      if (loadedChart) {
+        this.chartDetails = loadedChart.details;
+        this.chartData = loadedChart.data;
+        this.chartOptions = loadedChart.options;
+      } else {
+        this.initializeNewChart();
+        this.saveCurrentChart();
+      }
+    });
+  }
+
+  private initializeNewChart(): void {
+    this.chartDetails = {
+      creationDate: new Date().toLocaleString(),
+    };
+    this.chartOptions = {
+      plugins: {
+        legend: { display: true },
+        title: { display: true, text: '' },
+      },
+    };
+    this.chartData = {
+      labels: [],
+      datasets: [],
+    };
+  }
+
+  saveCurrentChart(): void {
+    if (!this.chartId) return;
+
+    const chartToSave: ChartDataModel = {
+      id: this.chartId,
+      type: 'pie',
+      details: this.chartDetails,
+      data: this.chartData,
+      options: this.chartOptions,
+    };
+    this._storageService.saveChart(chartToSave);
+  }
+
   trackByFn(index: number, item: any) {
     return index;
   }
 
-  exportAsImage() {
-    html2canvas(this.captureMe.nativeElement).then((canvas: any) => {
-      const image = canvas.toDataURL('image/png');
-
-      const link = document.createElement('a');
-      link.href = image;
-      link.download = `pie_chart_${new Date()
-        .toLocaleString('en-GB', { hour12: false })
-        .replace(/[/,:\s]/g, '')}.png`;
-      link.click();
-    });
+  getBackgroundColor(labelIndex: number) {
+    return (
+      (this.chartData as any)?.datasets[0]?.backgroundColor[labelIndex] ||
+      'black'
+    );
   }
 
   donutViewChange = (event: MatCheckboxChange) => {
-    const currentData = { ...this.pieChartOptions } as any;
+    const currentData = { ...this.chartOptions } as any;
     currentData.cutout = event.checked ? '50%' : '';
 
-    this.pieChartOptions = currentData;
+    this.chartOptions = currentData;
+    this.saveCurrentChart();
   };
 
   addLabel = () => {
-    const currentData = { ...this.pieChartData };
+    const currentData = { ...this.chartData };
     currentData.labels?.push('');
+    if (!currentData.datasets.length)
+      currentData.datasets.push({ data: [], backgroundColor: [] });
 
     currentData.datasets.forEach((dataSet: any) => {
       dataSet.data.push(0);
     });
 
-    this.pieChartData = currentData;
+    this.chartData = currentData;
+
+    console.log('chartData', this.chartData);
+    this.saveCurrentChart();
   };
 
   addSeries = () => {
-    const currentData = { ...this.pieChartData };
+    const currentData = { ...this.chartData };
     currentData.datasets.push({
       data: new Array(currentData.labels?.length),
       label: '',
       borderColor: 'black',
     });
 
-    this.pieChartData = currentData;
+    this.chartData = currentData;
+    this.saveCurrentChart();
   };
 
   updateLabel = (labelIndex: number, event: Event) => {
     const value = (event.target as HTMLTextAreaElement).value;
-    const currentData = { ...this.pieChartData };
+    const currentData = { ...this.chartData };
 
     currentData.labels![labelIndex] = value;
 
-    this.pieChartData = currentData;
+    this.chartData = currentData;
+    this.saveCurrentChart();
   };
 
   updateSeriesValue = (
@@ -120,37 +161,41 @@ export class PieChartComponent {
     event: Event
   ) => {
     const value = (event.target as HTMLInputElement).value as any;
-    const currentData = { ...this.pieChartData };
+    const currentData = { ...this.chartData };
 
     currentData.datasets[seriesIndex].data[labelIndex] = value;
 
-    this.pieChartData = currentData;
+    this.chartData = currentData;
+    this.saveCurrentChart();
   };
 
   updateSeriesColor = (labelIndex: number, event: Event) => {
     const value = (event.target as HTMLInputElement).value;
-    const currentData = { ...this.pieChartData };
+    const currentData = { ...this.chartData };
 
     (currentData.datasets[0].backgroundColor as any)[labelIndex] = value;
 
-    this.pieChartData = currentData;
+    this.chartData = currentData;
+    this.saveCurrentChart();
   };
 
   deleteLabel = (index: number) => {
-    const currentData = { ...this.pieChartData };
+    const currentData = { ...this.chartData };
 
     currentData.labels?.splice(index, 1);
     currentData.datasets.forEach((dataSet: any) => {
       dataSet.data.splice(index, 1);
     });
 
-    this.pieChartData = currentData;
+    this.chartData = currentData;
+    this.saveCurrentChart();
   };
 
   deleteSeries = (index: number) => {
-    const currentData = { ...this.pieChartData };
+    const currentData = { ...this.chartData };
     currentData.datasets.splice(index, 1);
 
-    this.pieChartData = currentData;
+    this.chartData = currentData;
+    this.saveCurrentChart();
   };
 }

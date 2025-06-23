@@ -1,8 +1,5 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
-
-import { BaseChartDirective } from 'ng2-charts';
-import { ChartConfiguration } from 'chart.js';
 import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -10,15 +7,19 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSliderModule } from '@angular/material/slider';
-import html2canvas from 'html2canvas-pro';
+import { ActivatedRoute } from '@angular/router';
+
+import { ChartConfiguration } from 'chart.js';
+
+import { ChartDetailComponent } from '../../shared/components/chart-detail/chart-detail.component';
+import { ChartDataModel, ChartInfo } from '../../shared/models/chart.model';
+import { StorageService } from '../../shared/services/storage.service';
 
 @Component({
   selector: 'app-line-chart',
   templateUrl: './line-chart.component.html',
-  styleUrls: ['./line-chart.component.scss'],
   imports: [
     CommonModule,
-    BaseChartDirective,
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
@@ -26,18 +27,16 @@ import html2canvas from 'html2canvas-pro';
     MatButtonModule,
     MatIconModule,
     MatSliderModule,
+    ChartDetailComponent,
   ],
 })
-export class LineChartComponent {
-  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
-  @ViewChild('captureMe', { static: false }) captureMe!: ElementRef;
+export class LineChartComponent implements OnInit {
+  private _activatedRoute = inject(ActivatedRoute);
+  private _storageService = inject(StorageService);
 
-  public lineChartData: ChartConfiguration['data'] = {
-    datasets: [],
-    labels: [],
-  };
-
-  public lineChartOptions: ChartConfiguration['options'] = {
+  chartId: string = '';
+  chartDetails: ChartInfo = { creationDate: '' };
+  chartOptions: ChartConfiguration<'line'>['options'] = {
     elements: {
       line: {
         tension: 0.5,
@@ -47,74 +46,123 @@ export class LineChartComponent {
       legend: { display: true },
     },
   };
+  chartData: ChartConfiguration['data'] = { labels: [], datasets: [] };
 
   get tensionValue() {
-    return (this.lineChartOptions!.elements!.line!.tension as number) * 100;
+    return ((this.chartOptions?.elements?.line?.tension as number) || 0) * 100;
+  }
+
+  ngOnInit(): void {
+    this._activatedRoute.params.subscribe((params) => {
+      const id = params['id'];
+      if (!id) return;
+
+      this.chartId = id;
+      const loadedChart = this._storageService.getChartById(id);
+
+      if (loadedChart) {
+        this.chartDetails = loadedChart.details;
+        this.chartData = loadedChart.data;
+        this.chartOptions = loadedChart.options;
+      } else {
+        this.initializeNewChart();
+        this.saveCurrentChart();
+      }
+    });
+  }
+
+  private initializeNewChart(): void {
+    this.chartDetails = {
+      creationDate: new Date().toLocaleString(),
+    };
+    this.chartOptions = {
+      plugins: {
+        legend: { display: true },
+        title: { display: true, text: '' },
+      },
+    };
+    this.chartData = {
+      labels: [],
+      datasets: [],
+    };
+  }
+
+  saveCurrentChart(): void {
+    if (!this.chartId) return;
+
+    const chartToSave: ChartDataModel = {
+      id: this.chartId,
+      type: 'line',
+      details: this.chartDetails,
+      data: this.chartData,
+      options: this.chartOptions,
+    };
+    this._storageService.saveChart(chartToSave);
   }
 
   trackByFn(index: number, item: any) {
     return index;
   }
 
-  exportAsImage() {
-    html2canvas(this.captureMe.nativeElement).then((canvas) => {
-      const image = canvas.toDataURL('image/png');
-
-      const link = document.createElement('a');
-      link.href = image;
-      link.download = `line_chart_${new Date()
-        .toLocaleString('en-GB', { hour12: false })
-        .replace(/[/,:\s]/g, '')}.png`;
-      link.click();
-    });
-  }
-
   tensionChanged = (event: Event) => {
     const value = Number((event.target as HTMLInputElement).value);
-    const currentData = { ...this.lineChartOptions };
+    const currentData = { ...this.chartOptions };
+
+    if (!currentData.elements) {
+      currentData.elements = {
+        line: {
+          tension: value / 100 || 0,
+        },
+      };
+    }
     currentData.elements!.line!.tension = value / 100 || 0;
 
-    this.lineChartOptions = currentData;
+    this.chartOptions = currentData;
+    this.saveCurrentChart();
   };
 
   addLabel = () => {
-    const currentData = { ...this.lineChartData };
+    const currentData = { ...this.chartData };
     currentData.labels?.push('');
 
     currentData.datasets.forEach((dataSet) => {
       dataSet.data.push(0);
     });
 
-    this.lineChartData = currentData;
+    this.chartData = currentData;
+    this.saveCurrentChart();
   };
 
   addSeries = () => {
-    const currentData = { ...this.lineChartData };
+    const currentData = { ...this.chartData };
     currentData.datasets.push({
       data: new Array(currentData.labels?.length),
       label: '',
       borderColor: 'black',
     });
 
-    this.lineChartData = currentData;
+    this.chartData = currentData;
+    this.saveCurrentChart();
   };
 
   updateLabel = (labelIndex: number, event: Event) => {
     const value = (event.target as HTMLTextAreaElement).value;
-    const currentData = { ...this.lineChartData };
+    const currentData = { ...this.chartData };
 
     currentData.labels![labelIndex] = value;
 
-    this.lineChartData = currentData;
+    this.chartData = currentData;
+    this.saveCurrentChart();
   };
 
   updateSeriesLabel = (seriesIndex: number, event: Event) => {
     const value = (event.target as HTMLTextAreaElement).value;
-    const currentData = { ...this.lineChartData };
+    const currentData = { ...this.chartData };
 
     currentData.datasets[seriesIndex].label = value;
 
-    this.lineChartData = currentData;
+    this.chartData = currentData;
+    this.saveCurrentChart();
   };
 
   updateSeriesValue = (
@@ -123,37 +171,41 @@ export class LineChartComponent {
     event: Event
   ) => {
     const value = (event.target as HTMLInputElement).value as any;
-    const currentData = { ...this.lineChartData };
+    const currentData = { ...this.chartData };
 
     currentData.datasets[seriesIndex].data[labelIndex] = value;
 
-    this.lineChartData = currentData;
+    this.chartData = currentData;
+    this.saveCurrentChart();
   };
 
   updateSeriesColor = (seriesIndex: number, event: Event) => {
     const value = (event.target as HTMLInputElement).value;
-    const currentData = { ...this.lineChartData };
+    const currentData = { ...this.chartData };
 
     currentData.datasets[seriesIndex].borderColor = value;
 
-    this.lineChartData = currentData;
+    this.chartData = currentData;
+    this.saveCurrentChart();
   };
 
   deleteLabel = (index: number) => {
-    const currentData = { ...this.lineChartData };
+    const currentData = { ...this.chartData };
 
     currentData.labels?.splice(index, 1);
     currentData.datasets.forEach((dataSet) => {
       dataSet.data.splice(index, 1);
     });
 
-    this.lineChartData = currentData;
+    this.chartData = currentData;
+    this.saveCurrentChart();
   };
 
   deleteSeries = (index: number) => {
-    const currentData = { ...this.lineChartData };
+    const currentData = { ...this.chartData };
     currentData.datasets.splice(index, 1);
 
-    this.lineChartData = currentData;
+    this.chartData = currentData;
+    this.saveCurrentChart();
   };
 }

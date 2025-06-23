@@ -38,6 +38,7 @@ export class LocalizationService {
             ...currentTranslations,
             [lang]: translations,
           });
+          this.language$.next(lang);
         })
       )
       .subscribe();
