@@ -1,0 +1,21 @@
+{
+  "chartGenerator": "Trình tạo biểu đồ",
+  "createNewChart": "Tạo biểu đồ mới",
+  "filters": "Bộ lọc",
+  "all": "Tất cả",
+  "lineChart": "Biểu đồ đường",
+  "barChart": "Biểu đồ cột",
+  "pieChart": "Biểu đồ tròn",
+  "chartList": "Danh sách biểu đồ",
+  "noChartsFound": "Không tìm thấy biểu đồ",
+  "noChartsMatch": "Không có biểu đồ nào khớp với bộ lọc của bạn.",
+  "selectChartType": "Chọn một loại biểu đồ để bắt đầu",
+  "goBack": "Quay lại",
+  "line": "Biểu đồ đường",
+  "bar": "Biểu đồ cột",
+  "pie": "Biểu đồ tròn",
+  "creationDate": "Tạo ngày",
+  "saveImage": "Lưu ảnh",
+  "settings": "Cài đặt",
+  "chartTitle": "Tiêu đề biểu đồ"
+}
