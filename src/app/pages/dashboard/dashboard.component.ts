@@ -75,6 +75,13 @@ export class DashboardComponent implements OnInit {
               tension: 0.5,
             },
           },
+          datalabels: {
+            font: {
+              weight: 'normal',
+              size: 16,
+            },
+          },
+          unitOption: '%',
         },
       },
     };
