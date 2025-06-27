@@ -1,26 +1,26 @@
-import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
+import { ChartConfiguration, ChartData } from 'chart.js';
+import { ChartDataModel, ChartInfo } from '../../shared/models/chart.model';
+import { Component, OnInit, inject } from '@angular/core';
 import {
   MatCheckboxChange,
   MatCheckboxModule,
 } from '@angular/material/checkbox';
+
+import { ActivatedRoute } from '@angular/router';
+import { ChartDetailComponent } from '../../shared/components/chart-detail/chart-detail.component';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { ActivatedRoute } from '@angular/router';
-
-import { ChartConfiguration, ChartData } from 'chart.js';
-
-import { ChartDetailComponent } from '../../shared/components/chart-detail/chart-detail.component';
-import { ChartDataModel, ChartInfo } from '../../shared/models/chart.model';
 import { StorageService } from '../../shared/services/storage.service';
 
 @Component({
   selector: 'app-pie-chart',
   templateUrl: './pie-chart.component.html',
+  styleUrls: ['./pie-chart.component.scss'],
   imports: [
     CommonModule,
     FormsModule,
@@ -39,7 +39,7 @@ export class PieChartComponent implements OnInit {
 
   chartId: string = '';
   chartDetails: ChartInfo = { creationDate: '' };
-  chartOptions: ChartConfiguration<'pie'>['options'] = {};
+  chartOptions: any = {};
   chartData: ChartData = {
     labels: [],
     datasets: [
@@ -49,6 +49,8 @@ export class PieChartComponent implements OnInit {
       },
     ],
   };
+  showLabel: boolean = false;
+  unitOption: string = '%';
 
   ngOnInit(): void {
     this._activatedRoute.params.subscribe((params) => {
@@ -57,10 +59,21 @@ export class PieChartComponent implements OnInit {
 
       this.chartId = id;
       const loadedChart = this._storageService.getChartById(id);
-
       if (loadedChart) {
         this.chartDetails = loadedChart.details;
         this.chartData = loadedChart.data;
+        this.showLabel = loadedChart.options.plugins?.datalabels?.showLabel
+          ? true
+          : false;
+        this.unitOption = loadedChart.options.unitOption;
+        if (this.showLabel) {
+          loadedChart.options.plugins.datalabels.formatter = (
+            value: any,
+            ctx: any
+          ) => {
+            return value + this.unitOption;
+          };
+        }
         this.chartOptions = loadedChart.options;
       } else {
         this.initializeNewChart();
@@ -117,6 +130,35 @@ export class PieChartComponent implements OnInit {
     this.saveCurrentChart();
   };
 
+  showLabelChange = (event: MatCheckboxChange) => {
+    this.showLabel = event.checked;
+
+    const currentData = { ...this.chartOptions } as any;
+
+    if (this.showLabel) {
+      currentData.plugins.datalabels.formatter = (value: any, ctx: any) => {
+        return value + this.unitOption;
+      };
+    } else {
+      delete currentData.plugins.datalabels.formatter;
+    }
+
+    currentData.plugins.datalabels.showLabel = this.showLabel;
+    this.chartOptions = currentData;
+
+    this.saveCurrentChart();
+  };
+
+  updateUnitOption = (event: Event) => {
+    const value = (event.target as HTMLInputElement).value as any;
+    this.unitOption = value;
+    const currentData = { ...this.chartOptions } as any;
+    currentData.unitOption = this.unitOption;
+    this.chartOptions = currentData;
+
+    this.saveCurrentChart();
+  };
+
   addLabel = () => {
     const currentData = { ...this.chartData };
     currentData.labels?.push('');
@@ -129,7 +171,6 @@ export class PieChartComponent implements OnInit {
 
     this.chartData = currentData;
 
-    console.log('chartData', this.chartData);
     this.saveCurrentChart();
   };
 

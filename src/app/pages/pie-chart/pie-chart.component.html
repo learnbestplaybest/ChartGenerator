@@ -2,11 +2,23 @@
   type="pie"
   [chartInfo]="chartDetails"
   [chartData]="chartData"
-  [chartOption]="chartOptions"
+  [(chartOption)]="chartOptions"
   [chartId]="chartId"
+  [showLabel]="showLabel"
 >
   <div chartSetting>
     <mat-checkbox (change)="donutViewChange($event)">Donut chart</mat-checkbox>
+    <div class="label-option">
+      <mat-checkbox [checked]="showLabel" (change)="showLabelChange($event)"
+        >Show label</mat-checkbox
+      >
+      <input
+        *ngIf="showLabel"
+        class="ml-2 w-[50px] bg-gray-700 px-2 py-1 border border-gray-500 rounded-lg rounded-lg focus:ring-0 font-bold text-white text-2xl"
+        [value]="unitOption"
+        (input)="updateUnitOption($event)"
+      />
+    </div>
 
     <table>
       @if (chartData.labels?.length) {

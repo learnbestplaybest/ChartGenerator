@@ -14,7 +14,7 @@
       <div>
         <input
           type="text"
-          [value]="chartOption!.plugins!.title!.text"
+          [value]="chartOption!.plugins?.title?.text"
           (input)="updateChartTitle($event)"
           class="bg-gray-700 px-2 py-1 border border-gray-500 rounded-lg rounded-lg focus:ring-0 w-full font-bold text-white text-2xl"
           placeholder="{{ 'chartTitle' | translate | async }}"
@@ -66,6 +66,7 @@
         [type]="type"
         [data]="chartData"
         [options]="chartOption"
+        [plugins]="chartPlugins"
       >
       </canvas>
     </section>

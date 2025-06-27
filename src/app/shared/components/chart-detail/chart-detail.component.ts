@@ -1,20 +1,22 @@
-import { CommonModule } from '@angular/common';
+import { ChartInfo, ChartType } from '../../models/chart.model';
 import {
   Component,
   ElementRef,
-  inject,
+  EventEmitter,
   Input,
+  Output,
   ViewChild,
   ViewEncapsulation,
+  inject,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 
-import html2canvas from 'html2canvas-pro';
 import { BaseChartDirective } from 'ng2-charts';
-
-import { ChartInfo, ChartType } from '../../models/chart.model';
-import { TranslatePipe } from '../../pipes/translate-pipe';
+import { CommonModule } from '@angular/common';
+import DatalabelsPlugin from 'chartjs-plugin-datalabels';
+import { FormsModule } from '@angular/forms';
 import { StorageService } from '../../services/storage.service';
+import { TranslatePipe } from '../../pipes/translate-pipe';
+import html2canvas from 'html2canvas-pro';
 
 @Component({
   selector: 'chart-detail',
@@ -25,6 +27,7 @@ import { StorageService } from '../../services/storage.service';
 })
 export class ChartDetailComponent {
   private _storageService = inject(StorageService);
+  chartPlugins: any = [];
 
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
   @ViewChild('captureMe', { static: false }) captureMe!: ElementRef;
@@ -34,8 +37,38 @@ export class ChartDetailComponent {
     creationDate: Date.now.toString(),
   };
   @Input() chartData: any;
-  @Input() chartOption: any;
+
+  private _chartOption: any;
+  @Input()
+  get chartOption(): any {
+    return this._chartOption;
+  }
+  @Output() chartOptionChange = new EventEmitter<any>();
+  set chartOption(value: any) {
+    this._chartOption = value;
+    this.chartOptionChange.emit(this._chartOption);
+  }
+
   @Input() chartId!: string;
+
+  private _showLabel: boolean = false;
+  @Input()
+  get showLabel(): boolean {
+    return this._showLabel;
+  }
+
+  set showLabel(value: boolean) {
+    this._showLabel = value;
+    if (value) {
+      this.chartPlugins.push(DatalabelsPlugin);
+      this.chart?.render();
+    } else {
+      this.chartPlugins = [];
+      setTimeout(() => {
+        this.chart?.render();
+      }, 200);
+    }
+  }
 
   updateChartTitle = (event: Event) => {
     const value = (event.target as HTMLInputElement).value;

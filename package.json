@@ -21,6 +21,7 @@
     "@ngrx/component-store": "^19.2.1",
     "@tailwindcss/postcss": "^4.1.8",
     "chart.js": "^4.3.0",
+    "chartjs-plugin-datalabels": "^2.2.0",
     "html2canvas-pro": "^1.5.11",
     "ng2-charts": "8.0.0",
     "postcss": "^8.5.4",
