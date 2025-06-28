@@ -10,4 +10,5 @@ export type ChartDataModel = {
   details: ChartInfo;
   data: any;
   options: any;
+  extra?: any;
 };

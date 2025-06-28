@@ -25,6 +25,10 @@
 .mdc-text-field__input {
   color: white !important;
 }
+.mdc-text-field__input::placeholder {
+  color: white !important;
+  opacity: 0.5 !important;
+}
 
 .mat-mdc-text-field-wrapper {
   background-color: var(--color-gray-700);
@@ -58,4 +62,8 @@
 
 .mat-mdc-checkbox label {
   color: white;
+}
+
+.mdc-text-field--filled:not(.mdc-text-field--disabled) {
+  background-color: var(--color-gray-700) !important;
 }

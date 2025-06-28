@@ -9,7 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSliderModule } from '@angular/material/slider';
 import { ActivatedRoute } from '@angular/router';
 
-import { ChartConfiguration } from 'chart.js';
+import { ChartConfiguration, ChartDataset } from 'chart.js';
 
 import { ChartDetailComponent } from '../../shared/components/chart-detail/chart-detail.component';
 import { ChartDataModel, ChartInfo } from '../../shared/models/chart.model';
@@ -104,6 +104,10 @@ export class LineChartComponent implements OnInit {
     return index;
   }
 
+  getLineStyle(dataSet: ChartDataset<any, any>) {
+    return dataSet.borderDash ? 'dash' : 'line';
+  }
+
   tensionChanged = (event: Event) => {
     const value = Number((event.target as HTMLInputElement).value);
     const currentData = { ...this.chartOptions };
@@ -118,6 +122,33 @@ export class LineChartComponent implements OnInit {
     currentData.elements!.line!.tension = value / 100 || 0;
 
     this.chartOptions = currentData;
+    this.saveCurrentChart();
+  };
+
+  lineStyleChanged = (seriesIndex: number, event: Event) => {
+    const value = (event.target as HTMLSelectElement).value;
+    const currentData = { ...this.chartData };
+
+    switch (value) {
+      case 'line':
+        if ((currentData.datasets[seriesIndex] as any).borderDash)
+          delete (currentData.datasets[seriesIndex] as any).borderDash;
+        break;
+      case 'dash':
+        (currentData.datasets[seriesIndex] as any).borderDash = [5, 5];
+        break;
+    }
+    this.chartData = currentData;
+    this.saveCurrentChart();
+  };
+
+  lineWidthChanged = (seriesIndex: number, event: Event) => {
+    const value = Number((event.target as HTMLInputElement).value);
+    const currentData = { ...this.chartData };
+
+    currentData.datasets[seriesIndex].borderWidth = value;
+
+    this.chartData = currentData;
     this.saveCurrentChart();
   };
 

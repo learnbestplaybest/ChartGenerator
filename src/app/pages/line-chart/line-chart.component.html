@@ -24,27 +24,49 @@
             class="p-2 border-gray-300 border-b-1"
             *ngIf="chartData.datasets?.length"
           >
-            <mat-form-field appearance="outline">
-              <textarea
-                [rows]="1"
-                matInput
-                [value]="dataSet.label"
-                (input)="updateSeriesLabel(seriesIndex, $event)"
-              ></textarea>
-              <input
-                type="color"
-                class="w-full"
-                [value]="dataSet.backgroundColor"
-                (input)="updateSeriesColor(seriesIndex, $event)"
-              />
-              <button
-                matIconButton
-                class="delete-btn"
-                (click)="deleteSeries(seriesIndex)"
-              >
-                <mat-icon>close</mat-icon>
-              </button>
-            </mat-form-field>
+            <div class="flex flex-col">
+              <mat-form-field appearance="outline">
+                <textarea
+                  [rows]="1"
+                  matInput
+                  [value]="dataSet.label"
+                  (input)="updateSeriesLabel(seriesIndex, $event)"
+                ></textarea>
+                <input
+                  type="color"
+                  class="w-full"
+                  [value]="dataSet.borderColor"
+                  (input)="updateSeriesColor(seriesIndex, $event)"
+                />
+
+                <button
+                  matIconButton
+                  class="delete-btn"
+                  (click)="deleteSeries(seriesIndex)"
+                >
+                  <mat-icon>close</mat-icon>
+                </button>
+              </mat-form-field>
+              <mat-form-field class="mt-2">
+                <select
+                  matNativeControl
+                  [value]="getLineStyle(dataSet)"
+                  (input)="lineStyleChanged(seriesIndex, $event)"
+                >
+                  <option value="line">Line</option>
+                  <option value="dash">Dash</option>
+                </select>
+              </mat-form-field>
+              <mat-form-field>
+                <input
+                  type="number"
+                  placeholder="Line width"
+                  matInput
+                  [value]="dataSet.borderWidth || 3"
+                  (input)="lineWidthChanged(seriesIndex, $event)"
+                />
+              </mat-form-field>
+            </div>
           </th>
         </ng-container>
         <th class="p-2 border-gray-300 border-b-1">

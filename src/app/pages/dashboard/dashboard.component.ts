@@ -1,15 +1,15 @@
-import { Component, OnInit, inject } from '@angular/core';
-
-import { ChartDataModel } from '../../shared/models/chart.model';
 import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-import { RoutePath } from '../../app.routes';
 import { Router } from '@angular/router';
-import { StorageService } from '../../shared/services/storage.service';
+
+import { RoutePath } from '../../app.routes';
+import { ChartDataModel } from '../../shared/models/chart.model';
 import { TranslatePipe } from '../../shared/pipes/translate-pipe';
+import { StorageService } from '../../shared/services/storage.service';
 
 interface Chart {
   id: number;
@@ -77,9 +77,9 @@ export class DashboardComponent implements OnInit {
           },
           datalabels: {
             font: {
-              weight: 'normal',
               size: 16,
             },
+            color: '#fff',
           },
           unitOption: '%',
         },

@@ -14,9 +14,16 @@
       >
       <input
         *ngIf="showLabel"
-        class="ml-2 w-[50px] bg-gray-700 px-2 py-1 border border-gray-500 rounded-lg rounded-lg focus:ring-0 font-bold text-white text-2xl"
+        class="bg-gray-700 ml-2 px-2 py-1 border border-gray-500 rounded-lg rounded-lg focus:ring-0 w-[50px] font-bold text-white text-2xl"
         [value]="unitOption"
         (input)="updateUnitOption($event)"
+      />
+      <input
+        *ngIf="showLabel"
+        type="number"
+        class="bg-gray-700 ml-2 px-2 py-1 border border-gray-500 rounded-lg rounded-lg focus:ring-0 w-[70px] font-bold text-white text-2xl"
+        [value]="labelSize"
+        (input)="updateLabelSize($event)"
       />
     </div>
 

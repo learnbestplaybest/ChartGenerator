@@ -1,20 +1,21 @@
-import { ChartConfiguration, ChartData } from 'chart.js';
-import { ChartDataModel, ChartInfo } from '../../shared/models/chart.model';
-import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import {
   MatCheckboxChange,
   MatCheckboxModule,
 } from '@angular/material/checkbox';
-
-import { ActivatedRoute } from '@angular/router';
-import { ChartDetailComponent } from '../../shared/components/chart-detail/chart-detail.component';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { ActivatedRoute } from '@angular/router';
+
+import { ChartData } from 'chart.js';
+
+import { ChartDetailComponent } from '../../shared/components/chart-detail/chart-detail.component';
+import { ChartDataModel, ChartInfo } from '../../shared/models/chart.model';
 import { StorageService } from '../../shared/services/storage.service';
 
 @Component({
@@ -51,6 +52,7 @@ export class PieChartComponent implements OnInit {
   };
   showLabel: boolean = false;
   unitOption: string = '%';
+  labelSize: number = 16;
 
   ngOnInit(): void {
     this._activatedRoute.params.subscribe((params) => {
@@ -62,10 +64,9 @@ export class PieChartComponent implements OnInit {
       if (loadedChart) {
         this.chartDetails = loadedChart.details;
         this.chartData = loadedChart.data;
-        this.showLabel = loadedChart.options.plugins?.datalabels?.showLabel
-          ? true
-          : false;
-        this.unitOption = loadedChart.options.unitOption;
+        this.showLabel = loadedChart.extra.showLabel;
+        this.unitOption = loadedChart.extra.unitOption;
+        this.labelSize = loadedChart.extra.labelSize;
         if (this.showLabel) {
           loadedChart.options.plugins.datalabels.formatter = (
             value: any,
@@ -107,6 +108,11 @@ export class PieChartComponent implements OnInit {
       details: this.chartDetails,
       data: this.chartData,
       options: this.chartOptions,
+      extra: {
+        showLabel: this.showLabel,
+        unitOption: this.unitOption,
+        labelSize: this.labelSize,
+      },
     };
     this._storageService.saveChart(chartToSave);
   }
@@ -135,15 +141,18 @@ export class PieChartComponent implements OnInit {
 
     const currentData = { ...this.chartOptions } as any;
 
+    if (!currentData.plugins.datalabels) {
+      currentData.plugins.datalabels = {};
+    }
+
     if (this.showLabel) {
       currentData.plugins.datalabels.formatter = (value: any, ctx: any) => {
         return value + this.unitOption;
       };
-    } else {
+    } else if (currentData.plugins.datalabels.formatter) {
       delete currentData.plugins.datalabels.formatter;
     }
 
-    currentData.plugins.datalabels.showLabel = this.showLabel;
     this.chartOptions = currentData;
 
     this.saveCurrentChart();
@@ -153,7 +162,18 @@ export class PieChartComponent implements OnInit {
     const value = (event.target as HTMLInputElement).value as any;
     this.unitOption = value;
     const currentData = { ...this.chartOptions } as any;
-    currentData.unitOption = this.unitOption;
+    this.chartOptions = currentData;
+
+    this.saveCurrentChart();
+  };
+
+  updateLabelSize = (event: Event) => {
+    const value = (event.target as HTMLInputElement).value as any;
+    this.labelSize = value;
+
+    const currentData = { ...this.chartOptions } as any;
+    currentData.plugins.datalabels.font = { size: value } as any;
+    currentData.plugins.datalabels.color = '#fff';
     this.chartOptions = currentData;
 
     this.saveCurrentChart();
