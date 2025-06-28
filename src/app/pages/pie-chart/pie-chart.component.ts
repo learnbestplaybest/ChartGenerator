@@ -52,7 +52,7 @@ export class PieChartComponent implements OnInit {
   };
   showLabel: boolean = false;
   unitOption: string = '%';
-  labelSize: number = 16;
+  labelSize: number = 30;
 
   ngOnInit(): void {
     this._activatedRoute.params.subscribe((params) => {
@@ -64,9 +64,16 @@ export class PieChartComponent implements OnInit {
       if (loadedChart) {
         this.chartDetails = loadedChart.details;
         this.chartData = loadedChart.data;
-        this.showLabel = loadedChart.extra.showLabel;
-        this.unitOption = loadedChart.extra.unitOption;
-        this.labelSize = loadedChart.extra.labelSize;
+        this.showLabel = loadedChart.extra?.showLabel || false;
+        this.unitOption = loadedChart.extra?.unitOption || '%';
+        this.labelSize = loadedChart.extra?.labelSize || 30;
+
+        if (!loadedChart.options.plugins) {
+          loadedChart.options.plugins = {};
+        }
+        if (!loadedChart.options.plugins.datalabels) {
+          loadedChart.options.plugins.datalabels = {};
+        }
         if (this.showLabel) {
           loadedChart.options.plugins.datalabels.formatter = (
             value: any,
@@ -142,13 +149,14 @@ export class PieChartComponent implements OnInit {
     const currentData = { ...this.chartOptions } as any;
 
     if (!currentData.plugins.datalabels) {
-      currentData.plugins.datalabels = {};
+      currentData.plugins.datalabels = { color: '#fff' };
     }
 
     if (this.showLabel) {
       currentData.plugins.datalabels.formatter = (value: any, ctx: any) => {
         return value + this.unitOption;
       };
+      currentData.plugins.color = '#fff';
     } else if (currentData.plugins.datalabels.formatter) {
       delete currentData.plugins.datalabels.formatter;
     }

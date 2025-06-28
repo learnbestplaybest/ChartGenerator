@@ -77,7 +77,7 @@ export class DashboardComponent implements OnInit {
           },
           datalabels: {
             font: {
-              size: 16,
+              size: 30,
             },
             color: '#fff',
           },
@@ -94,7 +94,9 @@ export class DashboardComponent implements OnInit {
     event.stopPropagation();
     if (
       window.confirm(
-        `Bạn có chắc chắn muốn xóa biểu đồ "${chart.options.plugins.title.text}" không?`
+        `Bạn có chắc chắn muốn xóa biểu đồ "${
+          chart.options.plugins?.title?.text || 'no name'
+        }" không?`
       )
     ) {
       this._storageService.deleteChart(chart.id);
